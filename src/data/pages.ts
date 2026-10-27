@@ -203,7 +203,7 @@ export const pages: Record<string, PageDef> = {
       ] },
       { t: 'text', label: 'Avec Arabesques', paras: [
         'Depuis sa création en 2006, le festival Arabesques (Montpellier) est devenu le principal festival en Europe dédié aux arts du monde arabe, où se retrouvent artistes émergents et « légendes vivantes ». Conscient de l’enjeu d’une nouvelle scène dynamique, Arabesques accompagne en parallèle des créations inspirées des cultures traditionnelles du monde arabe, ouvertes sur la modernité et le reste du monde.',
-      ], links: [{ label: 'Le festival Arabesques', href: 'https://www.festivalarabesques.fr/', external: true }, { label: 'Accompagnement des musiciens', href: '/l-association/accompagnement-des-musiciens' }] },
+      ], links: [{ label: 'Le festival Arabesques', href: 'https://arabesques-presentation.vercel.app/', external: true }, { label: 'Accompagnement des musiciens', href: '/l-association/accompagnement-des-musiciens' }] },
     ],
   },
 
@@ -337,7 +337,7 @@ export const pages: Record<string, PageDef> = {
       { t: 'videos', label: 'En images', title: 'Jeunes voix d’Arabesques', ids: ['owgmDf_O1ro', 'bj1tQklpAx4'] },
       { t: 'text', label: 'Concerts surprises', paras: ['Pendant le festival Arabesques, les écoles maternelles, élémentaires, collèges et lycées accueillent une troupe de musiciens dans leurs cours de récréation. Ces événements « surprises » permettent aux élèves de découvrir, depuis leur environnement quotidien, la richesse des instruments de la musique méditerranéenne.'] },
       { t: 'image', img: jeaProcession, alt: 'Des musiciens en tenue traditionnelle jouent des tambours devant des élèves' },
-      { t: 'text', label: 'Parcours du jeune spectateur', paras: ['UNi’SONS favorise la rencontre des artistes et du jeune public en leur permettant d’assister à de nombreuses représentations de la Caravane et du festival Arabesques. Chacune est préparée en classe avec les professionnels d’UNi’SONS (médiateur socioculturel et service éducatif).'], links: [{ label: 'Le festival Arabesques', href: 'https://www.festivalarabesques.fr/', external: true }] },
+      { t: 'text', label: 'Parcours du jeune spectateur', paras: ['UNi’SONS favorise la rencontre des artistes et du jeune public en leur permettant d’assister à de nombreuses représentations de la Caravane et du festival Arabesques. Chacune est préparée en classe avec les professionnels d’UNi’SONS (médiateur socioculturel et service éducatif).'], links: [{ label: 'Le festival Arabesques', href: 'https://arabesques-presentation.vercel.app/', external: true }] },
       { t: 'image', img: jeaCollege, alt: 'Des collégiens avec la chanteuse Souad Massi lors d’une rencontre', narrow: true },
       { t: 'text', label: 'Le CFA', title: 'Construction des décors du festival', paras: [
         'UNi’SONS s’est associée à plusieurs établissements : le CFA Hérault (bois et métallerie), le CFA de Méjannes-lès-Alès (peinture) et le lycée professionnel Léonard de Vinci de Montpellier (travail du bois). Élèves et apprentis ont collaboré toute l’année scolaire pour créer des décors utilisés au festival Arabesques, au Domaine d’O. Le projet met en avant les arts du monde arabe et les architectures traditionnelles de la région.',
@@ -431,7 +431,7 @@ export const pages: Record<string, PageDef> = {
     blocks: [
       { t: 'timeline', label: 'Les grandes dates', title: 'Vingt-six ans de projets', items: [
         { year: '2000', title: 'Naissance d’UNi’SONS', text: 'Fondée en 2000, l’association joue un rôle de premier plan dans le paysage artistique et socioculturel. Elle se consacre au hip-hop et aux arts du monde arabe.' },
-        { year: '2006', title: 'Le festival Arabesques', text: 'UNi’SONS crée à Montpellier le festival Arabesques, devenu le principal festival en Europe dédié aux arts du monde arabe. <a href="https://www.festivalarabesques.fr/" target="_blank" rel="noopener">Le site du festival<span class="visually-hidden"> (nouvel onglet)</span></a>' },
+        { year: '2006', title: 'Le festival Arabesques', text: 'UNi’SONS crée à Montpellier le festival Arabesques, devenu le principal festival en Europe dédié aux arts du monde arabe. <a href="https://arabesques-presentation.vercel.app/" target="_blank" rel="noopener">Le site du festival<span class="visually-hidden"> (nouvel onglet)</span></a>' },
         { year: '2016', title: 'Partenariat avec Cinemed', text: 'Les chantiers citoyens se prolongent avec le festival de cinéma méditerranéen Cinemed, à Montpellier.' },
         { year: '2020', title: 'L’art est public', text: 'UNi’SONS inaugure son tiers-lieu aux Hauts de Massane : galerie, studios et scène, aménagés avec les jeunes du quartier. <a href="/l-art-est-public">Découvrir le lieu</a>' },
         { year: '2024', title: 'REWIND', text: 'La galerie de L’art est public présente l’exposition REWIND d’Alain Garnier. <a href="/l-art-est-public/retrospectives">Les rétrospectives</a>' },
@@ -447,7 +447,7 @@ export const pages: Record<string, PageDef> = {
       { t: 'text', label: 'Arabesques et Caravane', paras: [
         'Le festival Arabesques célèbre la richesse des arts du monde arabe et révèle les nuances de cette mosaïque culturelle : l’originalité de chaque performance se fond dans un ensemble dont la variété est le fil conducteur.',
         'La Caravane Arabesques est une programmation itinérante, qui explore les quartiers, les écoles et les lieux culturels de la région. Chaque étape est l’occasion de partager et d’explorer l’individualité artistique sous toutes ses facettes.',
-      ], links: [{ label: 'Le festival Arabesques', href: 'https://www.festivalarabesques.fr/', external: true }, { label: 'Caravane Arabesques', href: 'https://www.festivalarabesques.fr/caravane-arabesques', external: true }] },
+      ], links: [{ label: 'Le festival Arabesques', href: 'https://arabesques-presentation.vercel.app/', external: true }, { label: 'Caravane Arabesques', href: 'https://arabesques-presentation.vercel.app/caravane-arabesques', external: true }] },
       { t: 'text', label: 'Cohésion sociale', paras: [
         'À L’art est public, UNi’SONS met aussi en place des actions de cohésion sociale et d’insertion socio-professionnelle, pour que chaque usager devienne acteur de sa vie culturelle et de sa place dans la société.',
       ], links: [{ label: 'Les Coulisses Solidaires', href: '/education-artistique/coulisses-solidaires' }] },

@@ -5,7 +5,7 @@ export const site = {
   tagline: 'L’école du son',
   address: ['475 Avenue du Comté de Nice', '34080 Montpellier'],
   phone: '04 67 10 06 79',
-  festival: 'https://www.festivalarabesques.fr',
+  festival: 'https://arabesques-presentation.vercel.app',
 };
 
 export interface NavItem { label: string; href: string; external?: boolean; bar?: boolean; children?: NavItem[]; }
