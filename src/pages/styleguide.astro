@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import logo from '../assets/logo/unisons.svg';
+import logoBlanc from '../assets/logo/unisons-blanc.svg';
+const colors = [
+  ['--bg', '#ffffff', 'Fond'], ['--bg-2', '#f5f4f0', 'Fond secondaire'], ['--ink', '#0b0b0d', 'Titres, menu, pied de page'],
+  ['--accent', '#ce9e31', 'Or : aplats, bandeaux, texte sur noir'], ['--accent-ink', '#8a6414', 'Or foncé : texte sur blanc'],
+  ['--text', '#4a4a44', 'Texte courant'], ['--muted', '#6b6a62', 'Texte secondaire'], ['--line', '#e4e2da', 'Filets'],
+];
+---
+<Base title="Guide de style | UNi’SONS" description="Charte graphique du site UNi’SONS : couleurs, typographie, composants et exemples de mise en page, à l’usage de l’équipe du site." noindex>
+  <PageHead label="Phase 1" title="Guide de style" sub="Charte et composants de base" align="left" />
+  <section class="sg">
+    <h2 class="label">Couleurs</h2>
+    <ul class="sw">
+      {colors.map(([v, hex, use]) => <li><i style={`background:${hex}`}></i><b>{v}</b><span>{hex}</span><em>{use}</em></li>)}
+    </ul>
+
+    <h2 class="label">Typographie</h2>
+    <div class="type">
+      <p class="display" style="font-size:var(--text-6xl);line-height:1.05">Titre 100 px</p>
+      <p class="display" style="font-size:var(--text-4xl);line-height:1.1">Titre 64 px</p>
+      <p class="display" style="font-size:var(--text-3xl);line-height:1.15">Titre 40 px</p>
+      <p>Texte courant en Inter, 16 px sur 24. Les titres sont en Anton, en capitales, avec un interlignage serré.</p>
+      <p class="label">Étiquette 14 px</p>
+      <p><a class="bracket" href="/styleguide">Lien crochets</a></p>
+    </div>
+
+    <h2 class="label">Logo</h2>
+    <div class="logos">
+      <div class="on-light"><img src={logo.src} alt="UNi’SONS, version couleur" width="246" height="53" /></div>
+      <div class="on-dark"><img src={logoBlanc.src} alt="UNi’SONS, version blanche" width="246" height="53" /></div>
+    </div>
+    <p class="note">Logos vectoriels tirés des fichiers Illustrator du dossier Stage (version couleur, version blanche pour fonds sombres).</p>
+
+    <h2 class="label">Contrastes</h2>
+    <div class="cc">
+      <div style="background:#fff;color:#8a6414">Or foncé sur blanc (5,4)</div>
+      <div style="background:#0b0b0d;color:#ce9e31">Or sur noir (8,5)</div>
+      <div style="background:#ce9e31;color:#0b0b0d">Noir sur or (8,5)</div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .sg { padding: 0 var(--pad) 100px; display: grid; gap: 28px; }
+  .sg > h2 { margin-top: 40px; }
+  .sw { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .sw li { display: grid; gap: 2px; font-size: 13px; border: 1px solid var(--line); padding: 0 0 10px; }
+  .sw i { display: block; height: 64px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .sw b, .sw span, .sw em { padding: 0 12px; font-style: normal; }
+  .sw b { color: var(--strong); }
+  .type { display: grid; gap: 18px; justify-items: start; }
+  .logos { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .logos div { padding: 40px; display: grid; place-items: center; border: 1px solid var(--line); }
+  .on-dark { background: var(--dark); }
+  .logos img { width: 246px; height: auto; }
+  .note { font-size: 14px; color: var(--muted); }
+  .cc { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .cc div { padding: 24px; font-weight: 600; border: 1px solid var(--line); }
+</style>

@@ -1,0 +1,165 @@
+---
+import { Picture } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import BigCta from '../../components/BigCta.astro';
+import Newsletter from '../../components/Newsletter.astro';
+import { galleryFeatured as expo, galleryStarted as started, pastExpos } from '../../data/expos';
+import { shortDay } from '../../data/events';
+import { site } from '../../data/site';
+import { picProps, widthsFor, absUrl } from '../../lib/cms';
+import { fitTitle, fitDescription } from '../../lib/seo';
+
+// Les textes viennent de Sanity (ou du contenu local) : ils sont affichés comme du texte, jamais en HTML.
+const flag = started ? 'En ce moment' : 'Prochaine exposition';
+const hero = expo ? (expo.images[0] ?? expo.poster) : undefined;
+const more = expo ? expo.images.slice(1) : [];
+const artistName = expo ? expo.artist.split(',')[0].trim() : '';
+const period = expo?.start ? (expo.end ? `Du ${shortDay(expo.start)} au ${shortDay(expo.end)}` : `À partir du ${shortDay(expo.start)}`) : '';
+const recent = pastExpos.slice(0, 6);
+const schema = expo ? [{
+  '@type': 'ExhibitionEvent', name: artistName ? `${expo.title}, ${artistName}` : expo.title, url: `${site.url}/l-art-est-public/galerie`,
+  ...(expo.start ? { startDate: expo.start } : {}), ...(expo.end ? { endDate: expo.end } : {}), isAccessibleForFree: true,
+  eventStatus: 'https://schema.org/EventScheduled', eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  description: expo.about[0] ?? expo.summary ?? '', ...(hero ? { image: [absUrl(site.url, hero.src)] } : {}),
+  location: { '@type': 'Place', name: 'La galerie, L’art est public', address: { '@type': 'PostalAddress', streetAddress: '475 avenue du Comté de Nice', postalCode: '34080', addressLocality: 'Montpellier', addressCountry: 'FR' } },
+  organizer: { '@id': `${site.url}/#org` },
+}] : [];
+const pageTitle = expo ? fitTitle(`Galerie | Exposition ${expo.title}${artistName ? `, ${artistName}` : ''} | UNi’SONS`, `Galerie | Exposition ${expo.title} | UNi’SONS`, `Exposition ${expo.title} | UNi’SONS`) : 'Galerie | Expositions de L’art est public | UNi’SONS';
+const pageDescription = fitDescription(expo
+  ? (expo.summary || `La galerie de L’art est public accueille l’exposition ${expo.title}${artistName ? `, ${artistName}` : ''}${period ? `. ${period}` : ''}. Entrée libre, à Montpellier.`)
+  : 'La galerie de L’art est public, à Montpellier : entrée libre. Aucune exposition en cours, retrouvez les expositions passées dans les rétrospectives.');
+---
+<Base title={pageTitle} description={pageDescription} image={hero?.src.src} schema={schema}>
+  <PageHead label="L’art est public" title="Galerie" sub="Expositions à Montpellier · Entrée libre" align="left" />
+
+  {expo ? (
+  <section class="feature section" aria-labelledby="expo-t">
+    <p class="flag label" data-reveal="left">{flag}{expo.vernissage && <> · Vernissage le {shortDay(expo.vernissage)}</>}</p>
+    <h2 id="expo-t" class="display" data-reveal="bottom">{expo.title}</h2>
+    {expo.artist && <p class="artist upper" data-reveal="bottom" data-reveal-delay="80">{expo.artist}</p>}
+    {period && <p class="period" data-reveal="bottom" data-reveal-delay="140">{period}</p>}
+    {hero && (
+      <figure class="main" data-reveal="shrink">
+        <Picture {...picProps(hero.src)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(hero.src, [640, 1080, 1320, 1800])} sizes="(max-width: 900px) 100vw, 1320px" alt={hero.alt} loading="eager" fetchpriority="high" />
+      </figure>
+    )}
+    {expo.about.length > 0 && (
+      <div class="cols">
+        <p class="label" data-reveal="left">À propos de l’exposition</p>
+        <div class="txt" data-reveal="bottom">
+          {expo.about.map((p) => <p>{p}</p>)}
+        </div>
+      </div>
+    )}
+    {more.length > 0 && (
+      <div class="pair">
+        {more.map((im) => (
+          <figure data-reveal="bottom">
+            <Picture {...picProps(im.src)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(im.src, [480, 800, 1200])} sizes="(max-width: 900px) 100vw, 650px" alt={im.alt} loading="lazy" />
+          </figure>
+        ))}
+      </div>
+    )}
+  </section>
+  ) : (
+  <section class="feature section" aria-labelledby="expo-t">
+    <p class="flag label" data-reveal="left">Galerie</p>
+    <h2 id="expo-t" class="display" data-reveal="bottom">Aucune exposition en cours</h2>
+    <p class="period" data-reveal="bottom" data-reveal-delay="80">Prochaine exposition à annoncer. Retrouvez les expositions précédentes ci-dessous, et l’agenda de L’art est public.</p>
+    <p class="all" data-reveal="bottom" data-reveal-delay="140"><a class="bracket" href="/agenda/l-art-est-public">Agenda de L’art est public</a></p>
+  </section>
+  )}
+
+  <section class="visit section" aria-labelledby="visit-t">
+    <p class="label" data-reveal="left">Infos pratiques</p>
+    <div class="col" data-reveal="bottom">
+      <h2 id="visit-t" class="display">Comment la voir ?</h2>
+      <dl>
+        {period && <div><dt>Dates</dt><dd>{period}</dd></div>}
+        <div><dt>Horaires</dt><dd>Du lundi au vendredi, de 14h30 à 18h00. Le premier samedi du mois, sous réservation.</dd></div>
+        <div><dt>Entrée</dt><dd>Libre</dd></div>
+        <div><dt>Lieu</dt><dd>La galerie, L’art est public<br />475 avenue du Comté de Nice, 34080 Montpellier<br /><a class="bracket" href="/infos-pratiques">Comment venir</a></dd></div>
+        <div><dt>Visite commentée</dt><dd>Sur rendez-vous auprès de Malika Aboubeker, médiatrice : <a class="lnk" href="mailto:m.aboubeker@unisons.fr">m.aboubeker@unisons.fr</a>, <a class="lnk" href="tel:+33499772809">04 99 77 28 09</a></dd></div>
+        <div><dt>Scolaires</dt><dd>De la primaire au lycée : visite guidée avec la médiatrice et dossier pédagogique fourni aux enseignants. Renseignements : Chloé Didier, <a class="lnk" href="mailto:c.didier@unisons.fr">c.didier@unisons.fr</a></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  {expo && expo.artistText.length > 0 && (
+  <section class="artist-text section" aria-labelledby="art-t">
+    <p class="label" data-reveal="left">À propos de l’artiste</p>
+    <div class="col" data-reveal="bottom">
+      <h2 id="art-t" class="display">{expo.artistHeading ?? (artistName || expo.title)}</h2>
+      {expo.artistText.map((p) => <p>{p}</p>)}
+      {expo.author && <p class="sign upper">{expo.author}</p>}
+    </div>
+  </section>
+  )}
+
+  <section class="past section" aria-labelledby="past-t">
+    <p class="label" data-reveal="left">Archives</p>
+    <h2 id="past-t" class="display" data-reveal="bottom">Les précédentes expositions</h2>
+    {recent.length > 0 && <ul class="cards">
+      {recent.map((x) => (
+        <li data-reveal="bottom">
+          <a href="/l-art-est-public/retrospectives" class="card">
+            {x.image ? <Picture {...picProps(x.image)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(x.image, [300, 600])} sizes="300px" alt="" loading="lazy" /> : <span class="ph" aria-hidden="true">{x.title.slice(0, 1)}</span>}
+            <span class="name display">{x.title}{x.year && <span class="yr"> {x.year}</span>}</span>
+          </a>
+        </li>
+      ))}
+    </ul>}
+    <p class="all"><a class="bracket" href="/l-art-est-public/retrospectives">Toutes les rétrospectives</a></p>
+  </section>
+  <BigCta />
+  <Newsletter />
+</Base>
+
+<style>
+  .feature { padding-top: 24px; }
+  .flag { color: var(--accent-ink); }
+  .feature h2 { font-size: var(--text-6xl); line-height: 1.05; margin-top: 24px; }
+  .artist { margin-top: 20px; }
+  .period { margin-top: 8px; font-size: 18px; color: var(--strong); }
+  .main { margin: 48px 0 0; }
+  .main :global(img) { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+  .cols { display: grid; grid-template-columns: 448px 1fr; margin-top: 72px; }
+  .txt { display: grid; gap: 18px; max-width: 760px; }
+  .txt p, .col p { font-size: 18px; line-height: 28px; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 72px; }
+  .pair figure { margin: 0; }
+  .pair :global(img) { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+  .visit, .artist-text { display: grid; grid-template-columns: 448px 1fr; border-top: 1px solid var(--line); padding-block: 72px; }
+  .col { max-width: 760px; display: grid; gap: 18px; }
+  .col h2 { font-size: var(--text-4xl); line-height: 1.1; margin-bottom: 8px; }
+  dl { border-top: 1px solid var(--line); }
+  dl > div { display: grid; grid-template-columns: 200px 1fr; gap: 24px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  dt { font: 500 13px/24px var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--strong); }
+  dd { margin: 0; }
+  .lnk { text-decoration: underline; text-underline-offset: 3px; }
+  .lnk:hover, .lnk:focus-visible { color: var(--accent-ink); }
+  dd .bracket { display: inline-block; margin-top: 10px; }
+  .sign { color: var(--strong); font-weight: 500; letter-spacing: .12em; }
+  .past { background: var(--bg-2); }
+  .past h2 { font-size: var(--text-5xl); line-height: 1.1; margin: 20px 0 48px; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .card { display: grid; gap: 14px; }
+  .card :global(img), .ph { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .ph { display: grid; place-items: center; background: var(--ink); color: var(--accent); font: 400 88px/1 var(--font-display); }
+  .name { font-size: 28px; line-height: 1.15; }
+  .yr { color: var(--accent-ink); }
+  .card:hover .name, .card:focus-visible .name { color: var(--accent-ink); }
+  .all { margin-top: 48px; }
+  @media (max-width: 1100px) {
+    .cols, .visit, .artist-text { grid-template-columns: 1fr; gap: 24px; }
+    .cards { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 900px) {
+    .pair { grid-template-columns: 1fr; margin-top: 40px; }
+    .cols { margin-top: 40px; }
+    dl > div { grid-template-columns: 1fr; gap: 4px; }
+    .cards { grid-template-columns: 1fr; }
+    .visit, .artist-text { padding-block: 48px; }
+  }
+</style>

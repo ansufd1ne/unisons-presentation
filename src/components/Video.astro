@@ -1,0 +1,65 @@
+---
+import { Image } from 'astro:assets';
+import videos from '../data/videos.json';
+// Vignette locale : rien n'est chargé depuis YouTube tant que le visiteur n'a pas cliqué.
+const thumbs = import.meta.glob<{ default: ImageMetadata }>('../assets/videos/*.jpg', { eager: true });
+// big : grand lecteur (page d'épisode) ; caption=false : pas de bandeau de titre ;
+// slot « poster » : vignette fournie par la page (sinon vignette locale de videos.json, sinon aplat noir).
+interface Props { id: string; title?: string; big?: boolean; caption?: boolean; }
+const { id, title: given, big = false, caption = true } = Astro.props;
+const v = videos.find((x) => x.id === id);
+const thumb = thumbs[`../assets/videos/${id}.jpg`]?.default;
+const title = given ?? v?.title ?? 'Vidéo';
+const hasPoster = Astro.slots.has('poster');
+---
+<a class:list={['video', { big }]} href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noopener noreferrer" data-video={id} data-title={title}>
+  {hasPoster ? <span class="poster"><slot name="poster" /></span> : thumb && <Image src={thumb} format="webp" widths={[480, 960]} sizes="(max-width: 900px) 100vw, 480px" alt="" loading="lazy" decoding="async" />}
+  <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M8 5v14l11-7z" fill="currentColor" /></svg></span>
+  {caption
+    ? <span class="cap">{title}<span class="visually-hidden"> (vidéo YouTube, s’ouvre dans un nouvel onglet ou se lit ici)</span></span>
+    : <span class="visually-hidden">Lire la vidéo : {title} (vidéo YouTube, s’ouvre dans un nouvel onglet ou se lit ici)</span>}
+</a>
+
+<style>
+  .video { position: relative; display: block; aspect-ratio: 16 / 9; background: #000; overflow: hidden; }
+  .video img { display: block; width: 100%; height: 100%; object-fit: cover; opacity: .82; transition: opacity .3s, transform .6s cubic-bezier(.22, 1, .36, 1); }
+  .poster { position: absolute; inset: 0; display: block; }
+  .poster :global(picture), .poster :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; opacity: .82; transition: opacity .3s, transform .6s cubic-bezier(.22, 1, .36, 1); }
+  .video:hover img, .video:focus-visible img, .video:hover .poster :global(img), .video:focus-visible .poster :global(img) { opacity: 1; transform: scale(1.03); }
+  .play { position: absolute; left: 50%; top: 50%; width: 72px; height: 72px; margin: -36px 0 0 -36px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: var(--ink); transition: transform .3s; }
+  .big .play { width: 112px; height: 112px; margin: -56px 0 0 -56px; }
+  .big .play svg { width: 44px; height: 44px; }
+  .video:hover .play, .video:focus-visible .play { transform: scale(1.1); }
+  .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 36px 16px 14px; background: linear-gradient(transparent, rgba(0, 0, 0, .8)); color: #fff; font: 500 14px/20px var(--font-body); }
+  .video :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  @media (max-width: 900px) {
+    .big .play { width: 80px; height: 80px; margin: -40px 0 0 -40px; }
+    .big .play svg { width: 32px; height: 32px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .video img, .poster :global(picture), .poster :global(img), .play { transition: none; }
+    .video:hover img, .video:focus-visible img, .video:hover .poster :global(img), .video:focus-visible .poster :global(img), .video:hover .play, .video:focus-visible .play { transform: none; }
+  }
+</style>
+
+<script>
+  import { hasConsent } from '../scripts/consent';
+  // Remplace la vignette par le lecteur (youtube-nocookie) au clic, si le visiteur a accepté les contenus externes. Aucune requête YouTube avant le clic.
+  document.addEventListener('click', (e) => {
+    const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a.video[data-video]');
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    const id = a.dataset.video ?? '';
+    if (!hasConsent('media')) return; // sans accord : le lien s'ouvre sur YouTube
+    if (!/^[A-Za-z0-9_-]{11}$/.test(id)) return; // identifiant douteux : on laisse le lien s'ouvrir sur YouTube
+    e.preventDefault();
+    const f = document.createElement('iframe');
+    f.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+    f.title = a.dataset.title ?? 'Vidéo';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.referrerPolicy = 'strict-origin-when-cross-origin';
+    f.allowFullscreen = true;
+    a.replaceChildren(f);
+    a.removeAttribute('href'); a.removeAttribute('target');
+    f.focus();
+  });
+</script>

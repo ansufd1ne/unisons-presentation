@@ -1,0 +1,64 @@
+---
+import { Picture } from 'astro:assets';
+import '../data/nav-cms'; // rubriques Sanity appliquées à `nav` avant lecture
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import Blocks from '../components/Blocks.astro';
+import BigCta from '../components/BigCta.astro';
+import Newsletter from '../components/Newsletter.astro';
+import { pages } from '../data/pages';
+import { plannedPaths, builtPaths, labelFor, parentOf, nav, site } from '../data/site';
+
+export function getStaticPaths() {
+  const defined = Object.keys(pages);
+  const missing = defined.filter((p) => !builtPaths.includes(p));
+  if (missing.length) throw new Error(`Ajouter à builtPaths (src/data/site.ts) : ${missing.join(', ')}`);
+  const stubs = plannedPaths().filter((p) => !defined.includes(p));
+  return [
+    ...defined.map((path) => ({ params: { slug: path.slice(1) }, props: { path } })),
+    ...stubs.map((path) => ({ params: { slug: path.slice(1) }, props: { path } })),
+  ];
+}
+const { path } = Astro.props as { path: string };
+const def = pages[path];
+const title = labelFor(path) ?? path;
+const parentHref = parentOf(path);
+const parentItem = nav.find((n) => n.href === parentHref);
+const siblings = (parentItem?.children ?? []).filter((c) => c.href !== path);
+const schema = path === '/infos-pratiques' ? [{ '@type': 'Place', name: 'UNi’SONS, L’art est public', url: site.url + path,
+  address: { '@type': 'PostalAddress', streetAddress: '475 avenue du Comté de Nice', postalCode: '34080', addressLocality: 'Montpellier', addressCountry: 'FR' },
+  geo: { '@type': 'GeoCoordinates', latitude: 43.6418785, longitude: 3.8133035 } }] : [];
+---
+{def ? (
+  <Base title={def.seo.title} description={def.seo.description} image={def.hero?.img.src} schema={schema} noindex={def.noindex}>
+    <PageHead label={def.label} title={def.title} sub={def.sub} align="left" />
+    {def.hero && (
+      <figure class="hero" data-reveal="shrink">
+        <Picture src={def.hero.img} formats={['avif', 'webp']} fallbackFormat="webp" widths={[640, 1080, 1320, 1800]} sizes="(max-width: 900px) 100vw, 1320px" alt={def.hero.alt} loading="eager" fetchpriority="high" />
+      </figure>
+    )}
+    <Blocks blocks={def.blocks} />
+    {siblings.length > 0 && (
+      <nav class="siblings section" aria-label={`Dans la rubrique ${parentItem?.label}`}>
+        <p class="label">Dans la rubrique {parentItem?.label}</p>
+        <ul>{[{ label: parentItem!.label + ' : vue d’ensemble', href: parentItem!.href }, ...siblings].map((s) => <li><a class="bracket" href={s.href}>{s.label}</a></li>)}</ul>
+      </nav>
+    )}
+    <BigCta />
+    <Newsletter />
+  </Base>
+) : (
+  <Base title={`${title} | UNi’SONS`} description={`${title} : page en cours de préparation sur le nouveau site d’UNi’SONS.`} noindex>
+    <PageHead label="UNi’SONS" title={title} align="left" />
+    <section class="soon"><p>Cette page est en cours de préparation. Elle sera publiée prochainement.</p><p class="links"><a class="bracket" href="/">Accueil</a><a class="bracket" href="/agenda">Agenda</a></p></section>
+  </Base>
+)}
+
+<style>
+  .hero { margin: 0; padding: 0 var(--pad) 24px; }
+  .hero :global(img) { display: block; width: 100%; aspect-ratio: 1320 / 600; object-fit: cover; }
+  .siblings { border-top: 1px solid var(--line); padding-block: 48px; display: grid; gap: 20px; }
+  .siblings ul { display: flex; flex-wrap: wrap; gap: 14px 36px; }
+  .soon { padding: 0 var(--pad) 140px; display: grid; gap: 24px; justify-items: start; min-height: 40vh; }
+  .links { display: flex; flex-wrap: wrap; gap: 32px; }
+</style>

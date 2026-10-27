@@ -1,0 +1,114 @@
+[
+  {
+    "path": "/",
+    "label": "Accueil"
+  },
+  {
+    "path": "/agenda",
+    "label": "Agenda (toutes les rubriques)"
+  },
+  {
+    "path": "/agenda/kosmik-club",
+    "label": "Agenda (Kosmik Club)"
+  },
+  {
+    "path": "/agenda/l-art-est-public",
+    "label": "Agenda (L’art est public)"
+  },
+  {
+    "path": "/l-art-est-public/galerie",
+    "label": "Galerie"
+  },
+  {
+    "path": "/l-art-est-public/retrospectives",
+    "label": "Rétrospectives"
+  },
+  {
+    "path": "/kosmik-hip-hop",
+    "label": "Kosmik Hip-Hop"
+  },
+  {
+    "path": "/kosmik-hip-hop/atelier-hip-hop",
+    "label": "Atelier Hip Hop"
+  },
+  {
+    "path": "/kosmik-hip-hop/accompagnement-artistique",
+    "label": "Accompagnement artistique"
+  },
+  {
+    "path": "/l-art-est-public",
+    "label": "L’art est public"
+  },
+  {
+    "path": "/l-art-est-public/le-lieu",
+    "label": "Le lieu"
+  },
+  {
+    "path": "/l-art-est-public/librairie",
+    "label": "Librairie"
+  },
+  {
+    "path": "/l-art-est-public/uni-jeunes-social-school",
+    "label": "Uni’Jeunes Social School"
+  },
+  {
+    "path": "/l-art-est-public/podcast",
+    "label": "Podcast"
+  },
+  {
+    "path": "/education-artistique",
+    "label": "Éducation artistique"
+  },
+  {
+    "path": "/education-artistique/renc-art",
+    "label": "Renc’Art"
+  },
+  {
+    "path": "/education-artistique/jeunesses-en-arabesque",
+    "label": "Jeunesses en Arabesque"
+  },
+  {
+    "path": "/education-artistique/coulisses-solidaires",
+    "label": "Les Coulisses Solidaires"
+  },
+  {
+    "path": "/education-artistique/programme-de-reussite-educative",
+    "label": "Programme de réussite éducative"
+  },
+  {
+    "path": "/l-association",
+    "label": "L’association"
+  },
+  {
+    "path": "/l-association/histoire",
+    "label": "L’histoire"
+  },
+  {
+    "path": "/l-association/equipe",
+    "label": "L’équipe"
+  },
+  {
+    "path": "/l-association/accompagnement-des-musiciens",
+    "label": "Accompagnement des musiciens"
+  },
+  {
+    "path": "/infos-pratiques",
+    "label": "Infos pratiques"
+  },
+  {
+    "path": "/infos-pratiques/telechargements",
+    "label": "Téléchargements"
+  },
+  {
+    "path": "/contact",
+    "label": "Contact"
+  },
+  {
+    "path": "/mentions-legales",
+    "label": "Mentions légales"
+  },
+  {
+    "path": "/politique-de-confidentialite",
+    "label": "Politique de confidentialité"
+  }
+]

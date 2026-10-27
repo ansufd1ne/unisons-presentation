@@ -1,0 +1,165 @@
+---
+import { Picture, getImage } from 'astro:assets';
+import '../../../data/nav-cms'; // rubriques Sanity appliquées à `nav` avant lecture
+import Base from '../../../layouts/Base.astro';
+import Blocks from '../../../components/Blocks.astro';
+import Video from '../../../components/Video.astro';
+import BigCta from '../../../components/BigCta.astro';
+import Newsletter from '../../../components/Newsletter.astro';
+import { podcastEpisodes, podcastInfo } from '../../../data/pages';
+import { site } from '../../../data/site';
+import {
+  picProps, widthsFor, fullDate, episodeTitle, episodePath, episodeDescription, otherEpisodes, isoDuration,
+  youtubeEmbedUrl, youtubeWatchUrl, PODCAST_MARQUEE, PODCAST_PATH,
+} from '../../../lib/cms';
+
+// Une page par épisode valide du podcast publié ; sans épisode (ou podcast provisoire), aucune page.
+export function getStaticPaths() {
+  return podcastEpisodes.map((e) => ({ params: { slug: e.slug }, props: { slug: e.slug } }));
+}
+const { slug } = Astro.props as { slug: string };
+const e = podcastEpisodes.find((x) => x.slug === slug)!;
+const pod = podcastInfo!;
+const title = episodeTitle(e);
+const im = e.image ?? pod.cover; // vignette de l'épisode, sinon visuel du podcast, sinon aplat noir
+const others = otherEpisodes(podcastEpisodes, e.slug);
+const url = site.url + episodePath(e.slug);
+const description = episodeDescription(e);
+const meta = [e.guests, e.guestRole, e.duration].filter(Boolean) as string[];
+
+// Image de partage : vignette optimisée (1200 px de large au plus)
+let ogImage: string | undefined;
+if (im) {
+  const w = Math.min(1200, im.src.width);
+  const opt = await getImage({ ...picProps(im.src), width: w, height: Math.round((w * im.src.height) / im.src.width), format: 'jpg' });
+  ogImage = new URL(opt.src, site.url).href;
+}
+const iso = isoDuration(e.duration);
+// Balisage VideoObject seulement quand l'épisode a une vidéo
+const schema = e.youtubeId ? [{
+  '@type': 'VideoObject', '@id': url + '#video', name: title,
+  description: e.paras.join(' ') || description, uploadDate: e.date,
+  ...(ogImage ? { thumbnailUrl: ogImage } : {}),
+  embedUrl: youtubeEmbedUrl(e.youtubeId), url,
+  ...(iso ? { duration: iso } : {}),
+  publisher: { '@type': 'Organization', '@id': `${site.url}/#org`, name: site.org, url: site.url + '/' },
+}] : [];
+const links = [
+  ...(e.youtubeId ? [{ label: 'Voir sur YouTube', href: youtubeWatchUrl(e.youtubeId) }] : []),
+  ...pod.listenLinks,
+];
+---
+<Base title={`${title} | Podcast | UNi’SONS`} description={description} image={ogImage} crumb={title} schema={schema}>
+  <header class="head">
+    <p class="label" data-intro="fade"><a href={PODCAST_PATH}>Podcast</a></p>
+    <h1 class="display" data-intro="words">{title}</h1>
+    <p class="meta upper" data-intro="fade">
+      {meta.map((m) => <><span>{m}</span><span aria-hidden="true"> · </span></>)}
+      <time datetime={e.date}>{fullDate(e.date)}</time>
+    </p>
+  </header>
+
+  <section class="player" aria-label="Vidéo de l’épisode" data-reveal="shrink">
+    {e.youtubeId ? (
+      <Video id={e.youtubeId} title={title} big caption={false}>
+        <Fragment slot="poster">
+          {im ? <Picture {...picProps(im.src)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(im.src, [640, 1080, 1320, 1800])} sizes="(max-width: 900px) 100vw, 1320px" alt="" loading="eager" fetchpriority="high" /> : <span class="fallback">{title}</span>}
+        </Fragment>
+      </Video>
+    ) : (
+      <div class="novideo">
+        {im ? <Picture {...picProps(im.src)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(im.src, [640, 1080, 1320, 1800])} sizes="(max-width: 900px) 100vw, 1320px" alt="" loading="eager" fetchpriority="high" /> : <span class="fallback">{title}</span>}
+        <p class="soon">Vidéo bientôt disponible</p>
+      </div>
+    )}
+  </section>
+
+  {links.length > 0 && (
+    <ul class="links" aria-label="Voir et écouter l’épisode">
+      {links.map((l) => <li><a class="bracket" href={l.href} target="_blank" rel="noopener noreferrer">{l.label}<span class="visually-hidden"> (nouvel onglet)</span></a></li>)}
+    </ul>
+  )}
+
+  <Blocks blocks={[{ t: 'marquee', words: PODCAST_MARQUEE }]} />
+
+  <section class="about section" aria-labelledby="about-t">
+    <h2 id="about-t" class="label" data-reveal="left">À propos de l’épisode</h2>
+    <div class="col" data-reveal="bottom" data-reveal-delay="100">
+      {e.paras.map((p) => <p>{p}</p>)}
+      {(e.guests || e.guestRole) && (
+        <dl>
+          {e.guests && <div><dt>Invité·es</dt><dd>{e.guests}</dd></div>}
+          {e.guestRole && <div><dt>Fonction</dt><dd>{e.guestRole}</dd></div>}
+        </dl>
+      )}
+    </div>
+  </section>
+
+  {others.length > 0 && (
+    <section class="others section" aria-labelledby="others-t">
+      <h2 id="others-t" class="label" data-reveal="left">Autres épisodes</h2>
+      <div class="rail" role="region" aria-labelledby="others-t">
+        <ul>
+          {others.map((o) => {
+            const oi = o.image ?? pod.cover;
+            return (
+              <li class="card">
+                <div class="thumb">
+                  {oi ? <Picture {...picProps(oi.src)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(oi.src, [400, 800])} sizes="(max-width: 900px) 78vw, 420px" alt="" loading="lazy" /> : <span class="ph" aria-hidden="true">{o.title}</span>}
+                </div>
+                <h3 class="display">{episodeTitle(o)}</h3>
+                <p class="date"><time datetime={o.date}>{fullDate(o.date)}</time></p>
+                <p><a class="bracket more" href={episodePath(o.slug)}>Voir l’épisode<span class="visually-hidden"> {episodeTitle(o)}</span></a></p>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  {pod.listenLinks.length > 0 && <Blocks blocks={[{ t: 'listen', label: 'Écouter', title: 'Où nous écouter', items: pod.listenLinks }]} />}
+
+  <p class="back"><a class="bracket" href={PODCAST_PATH}>Tous les épisodes</a></p>
+  <BigCta />
+  <Newsletter />
+</Base>
+
+<style>
+  .head { padding: 170px var(--pad) 40px; }
+  h1 { font-size: var(--text-6xl); line-height: 1.05; margin-top: 28px; overflow-wrap: anywhere; }
+  .label a:hover, .label a:focus-visible { color: var(--accent-ink); }
+  .meta { margin-top: 24px; }
+  .player { padding: 0 var(--pad); }
+  .novideo { position: relative; aspect-ratio: 16 / 9; background: #000; overflow: hidden; }
+  .novideo :global(picture), .novideo :global(img), .player :global(.video picture), .player :global(.video img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .novideo :global(img) { opacity: .6; }
+  .soon { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 24px 22px; background: linear-gradient(transparent, rgba(0, 0, 0, .8)); color: var(--accent); font: 500 14px/20px var(--font-body); letter-spacing: .2em; text-transform: uppercase; }
+  .fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 6%; color: var(--accent); background: #000; font: 400 clamp(32px, 6vw, 88px) / 1.05 var(--font-display); text-transform: uppercase; text-align: center; overflow-wrap: anywhere; }
+  .links { display: flex; flex-wrap: wrap; gap: 14px 40px; padding: 32px var(--pad) 56px; }
+  .about { display: grid; grid-template-columns: 448px 1fr; padding-block: 90px; border-top: 1px solid var(--line); }
+  .about .label { margin: 0; }
+  .col { max-width: 780px; display: grid; gap: 18px; align-content: start; }
+  .col p { font-size: 18px; line-height: 28px; }
+  dl { margin-top: 24px; border-top: 1px solid var(--line); }
+  dl > div { display: grid; grid-template-columns: 200px 1fr; gap: 24px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  dt { font: 500 13px/24px var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--strong); }
+  dd { margin: 0; }
+  .others { background: var(--bg-2); padding-inline: 0; overflow: hidden; }
+  .others .label { margin: 0 var(--pad) 32px; }
+  .rail { overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--pad); overscroll-behavior-x: contain; padding: 0 var(--pad) 18px; scrollbar-width: thin; scrollbar-color: var(--accent-ink) var(--line); }
+  .rail ul { display: flex; gap: 28px; width: max-content; }
+  .card { position: relative; flex: 0 0 min(420px, 78vw); scroll-snap-align: start; display: grid; gap: 10px; align-content: start; }
+  .thumb :global(img), .thumb .ph { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+  .thumb .ph { display: grid; place-items: center; padding: 16px; background: var(--ink); color: var(--accent); font: 400 28px / 1.1 var(--font-display); text-transform: uppercase; text-align: center; overflow-wrap: anywhere; }
+  .card h3 { font-size: 30px; line-height: 1.1; margin-top: 6px; overflow-wrap: anywhere; }
+  .date { font-size: 14px; line-height: 22px; color: var(--strong); letter-spacing: .04em; }
+  .back { padding: 48px var(--pad) 90px; }
+  @media (max-width: 1100px) { .about { grid-template-columns: 1fr; gap: 24px; padding-block: 64px; } }
+  @media (max-width: 900px) {
+    .head { padding-top: 120px; }
+    .links { padding-bottom: 40px; }
+    dl > div { grid-template-columns: 1fr; gap: 4px; }
+    .card h3 { font-size: 26px; }
+  }
+</style>

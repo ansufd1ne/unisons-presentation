@@ -1,0 +1,43 @@
+---
+import { Picture } from 'astro:assets';
+import a from '../assets/photos/about-a.jpg';
+import b from '../assets/photos/about-b.jpg';
+---
+<section class="about section" aria-labelledby="about-title" data-scrub data-y="20,0" data-opacity=".85,1" data-window="0,.2" data-smooth=".1">
+  <p class="label" data-reveal="left">L’association</p>
+  <h2 id="about-title" class="display" data-highlight>UNi’SONS place la culture au cœur de ses missions, du hip-hop aux arts du monde arabe.</h2>
+  <div class="row">
+    <p class="year display" data-reveal="left"><span class="visually-hidden">Depuis 2006</span><span aria-hidden="true">2006</span></p>
+    <div class="photo-a" data-reveal="bottom" data-reveal-delay="120">
+      <Picture src={a} formats={['avif', 'webp']} fallbackFormat="webp" widths={[424, 848]} sizes="(max-width: 900px) 100vw, 424px" alt="Un enfant écrit un texte à la main pendant un atelier d’écriture" loading="lazy" />
+      <p class="txt">Création du festival Arabesques à Montpellier. Depuis, l’association développe ateliers hip-hop, rencontres, expositions et accompagnement des musiciens.</p>
+      <a class="bracket more" href="/l-association">En savoir plus</a>
+    </div>
+    <div class="photo-b" data-reveal="right" data-reveal-delay="200">
+      <Picture src={b} formats={['avif', 'webp']} fallbackFormat="webp" widths={[312, 624]} sizes="(max-width: 900px) 60vw, 312px" alt="Un rappeur au micro, photographie en noir et blanc" loading="lazy" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .about { padding-top: 90px; padding-bottom: 110px; }
+  h2 { font-size: var(--text-5xl); line-height: 1.12; max-width: 1040px; margin: 36px 0 0 min(11vw, 160px); }
+  .row { display: grid; grid-template-columns: 1fr 1.28fr 1fr; gap: 24px; align-items: start; margin-top: 72px; }
+  .year { display: grid; place-items: center; aspect-ratio: 424 / 255; background: var(--accent); color: var(--ink); font-size: min(13.9vw, 200px); line-height: 1; letter-spacing: -0.03em; }
+  .photo-a :global(img) { width: 100%; aspect-ratio: 424 / 456; object-fit: cover; filter: grayscale(1); }
+  .txt { margin-top: 20px; max-width: 424px; font-size: 14px; line-height: 20px; text-transform: uppercase; }
+  .more { display: inline-block; margin-top: 28px; }
+  .photo-b { margin-top: 0; }
+  .photo-b :global(img) { width: 100%; aspect-ratio: 312 / 255; object-fit: cover; filter: grayscale(1); }
+  @media (max-width: 1100px) {
+    .row { grid-template-columns: 1fr 1fr; }
+    .year { grid-column: 1 / -1; aspect-ratio: auto; padding: 24px 0; }
+    .photo-b { align-self: end; }
+  }
+  @media (max-width: 900px) {
+    .about { padding-block: 56px; }
+    h2 { margin-left: 0; }
+    .row { grid-template-columns: 1fr; margin-top: 40px; }
+    .photo-b { max-width: 70%; }
+  }
+</style>

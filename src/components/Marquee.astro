@@ -1,0 +1,33 @@
+---
+import { marquee as defaultWords } from '../data/home';
+interface Props { words?: string[]; }
+const marquee = Astro.props.words ?? defaultWords;
+// Chaque ligne glisse selon le défilement de la page, en sens alternés (voir src/scripts/scroll-fx.ts).
+// Plages en % de la largeur de la ligne (300 vw) : -33,3 % = 100 vw de course.
+const rows = [
+  { x: '-33.333,0' },
+  { x: '0,-33.333' },
+  { x: '-33.333,0' },
+];
+const text = (marquee.map((w) => w.toUpperCase()).join(' * ') + ' * ').repeat(3);
+---
+<section class="marquee" aria-label={marquee.join(', ')}>
+  <div class="rows" aria-hidden="true">
+    {rows.map((r) => (
+      <div class="row">
+        <span data-scrub data-trigger=".marquee" data-x={r.x} data-smooth=".1">{text}</span>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .marquee { background: var(--accent); color: var(--ink); overflow: hidden; height: 502px; display: flex; align-items: center; }
+  .rows { width: 100%; }
+  .row { white-space: nowrap; font: 400 160px/1 var(--font-display); letter-spacing: -0.03em; height: 160px; }
+  .row span { display: block; width: 300vw; overflow: clip; }
+  @media (max-width: 900px) {
+    .marquee { height: 282px; }
+    .row { font-size: 88px; height: 88px; }
+  }
+</style>

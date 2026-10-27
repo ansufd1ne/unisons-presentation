@@ -1,0 +1,157 @@
+---
+import { Picture } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import AgendaListing from '../../components/AgendaListing.astro';
+import EventRow from '../../components/EventRow.astro';
+import BigCta from '../../components/BigCta.astro';
+import Newsletter from '../../components/Newsletter.astro';
+import { events, agendaPoles, bySlug, upcoming, longDate, period, type PoleId } from '../../data/events';
+import { site } from '../../data/site';
+import { picProps, widthsFor, absUrl } from '../../lib/cms';
+import { fitTitle, fitDescription, DESC_MIN } from '../../lib/seo';
+
+export function getStaticPaths() {
+  const poles = (Object.keys(agendaPoles) as PoleId[]).map((id) => ({ params: { slug: id }, props: { pole: id } }));
+  const evts = events.map((e) => ({ params: { slug: e.slug }, props: { event: e.slug } }));
+  return [...poles, ...evts];
+}
+const { pole, event } = Astro.props as { pole?: PoleId; event?: string };
+const e = event ? bySlug(event)! : null;
+const others = e ? upcoming().filter((x) => x.slug !== e.slug).slice(0, 3) : [];
+
+// Titre, description et balisage Event de la fiche
+const url = e ? `${site.url}/agenda/${e.slug}` : '';
+// Lieu réel (L'art est public) seulement si la fiche donne son adresse ; sinon la commune seule
+const adresse = e?.address?.match(/^(.+?),\s*(\d{5})\s+(.+)$/);
+const place = e ? { '@type': 'Place', name: e.venue, address: adresse
+  ? { '@type': 'PostalAddress', streetAddress: adresse[1], postalCode: adresse[2], addressLocality: adresse[3], addressCountry: 'FR' }
+  : { '@type': 'PostalAddress', addressLocality: 'Montpellier', addressCountry: 'FR' } } : null;
+const schema = e ? [{
+  '@type': 'Event', '@id': url + '#event', name: e.title, url,
+  startDate: e.date, ...(e.endDate ? { endDate: e.endDate } : {}),
+  eventStatus: 'https://schema.org/EventScheduled', eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  description: e.summary, image: [absUrl(site.url, e.hero)],
+  location: place,
+  organizer: { '@id': `${site.url}/#org` },
+  // Entrée libre seulement si la fiche le dit : aucun prix ni lien de billetterie n'est inventé
+  ...(e.free ? { isAccessibleForFree: true, offers: { '@type': 'Offer', url, price: '0', priceCurrency: 'EUR', availability: 'https://schema.org/InStock' } } : {}),
+}] : [];
+// Description : résumé de la fiche, complété par le lieu, l'entrée libre et la date, sans inventer d'horaire
+let desc = e ? e.summary.trim() : '';
+if (e) {
+  // Le nom de l'événement doit apparaître dans la description
+  if (!desc.toLowerCase().includes(e.title.toLowerCase())) desc = `${e.title}, ${desc.replace(/^([A-ZÀ-Ý])(?=[a-zà-ÿ])/, (c) => c.toLowerCase())}`;
+  const lieu = e.venue.split(',').pop()!.trim();
+  if (e.venue && e.venue !== 'Montpellier' && !desc.includes(lieu)) desc += ` Lieu : ${e.venue}.`;
+  if (e.free && !/entrée libre|gratuit/i.test(desc)) desc += ' Entrée libre.';
+  if (e.provisional) desc += e.venue === 'Montpellier' ? ' Lieu exact, horaire et programme à confirmer.' : ' Horaire et programme à confirmer.';
+  if ([...desc].length < DESC_MIN && !desc.includes(longDate(e.date))) desc += ` ${period(e)}.`;
+  if ([...desc].length < DESC_MIN) desc += ' Agenda d’UNi’SONS, à Montpellier.';
+}
+const titre = e ? fitTitle(`${e.title}, ${e.endDate ? period(e).toLowerCase() : longDate(e.date)} | Agenda UNi’SONS`, `${e.title} | Agenda UNi’SONS`) : '';
+---
+{e ? (
+  <Base
+    title={titre}
+    description={fitDescription(desc)}
+    image={absUrl(site.url, e.hero)}
+    crumb={e.title}
+    schema={schema}
+  >
+    <header class="head">
+      <p class="label"><a href="/agenda">Agenda</a></p>
+      <h1 class="display" data-intro="words">{e.title}</h1>
+      <p class="meta upper" data-intro="fade"><time datetime={e.date}>{period(e)}</time> · {e.venue}</p>
+      <ul class="actions" data-intro="fade">
+        <li><a class="bracket" href={`/agenda/${e.slug}.ics`} download>Ajouter au calendrier</a></li>
+        <li><button class="bracket share" type="button" data-title={e.title}>Partager</button></li>
+        <li><a class="bracket" href="/infos-pratiques">Infos pratiques</a></li>
+      </ul>
+      <p class="share-status visually-hidden" role="status" aria-live="polite"></p>
+    </header>
+
+    <figure class="hero" data-reveal="shrink">
+      <Picture {...picProps(e.hero)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(e.hero, [640, 1080, 1320, 1800])} sizes="(max-width: 900px) 100vw, 1320px" alt={e.heroAlt ?? e.alt} loading="eager" fetchpriority="high" />
+    </figure>
+
+    <section class="about section" aria-labelledby="about-t">
+      <p class="label" data-reveal="left">À propos</p>
+      <div class="col" data-reveal="bottom" data-reveal-delay="100">
+        <h2 id="about-t" class="display">Le rendez-vous</h2>
+        {e.body.map((p) => <p>{p}</p>)}
+        {e.provisional && <p class="note">Information à confirmer : date et programme peuvent évoluer.</p>}
+        <dl>
+          <div><dt>Date</dt><dd><time datetime={e.date}>{period(e)}</time></dd></div>
+          <div><dt>Lieu</dt><dd>{e.venue}{e.address && <>, {e.address}</>}</dd></div>
+          {e.practical?.filter(([k]) => k !== 'Exposition').map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+          {e.free && !e.practical && <div><dt>Entrée</dt><dd>Libre</dd></div>}
+        </dl>
+        {e.slug === 'hommage-mahmoud-darwich' && <p class="more"><a class="bracket" href="/l-art-est-public/galerie">Découvrir l’exposition</a></p>}
+      </div>
+    </section>
+
+    {others.length > 0 && (
+      <section class="next section" aria-labelledby="next-t">
+        <p class="label">À suivre</p>
+        <h2 id="next-t" class="display">Prochainement</h2>
+        <div class="list">{others.map((o) => <EventRow e={o} stack={false} />)}</div>
+        <p class="all"><a class="bracket" href="/agenda">Tout l’agenda</a></p>
+      </section>
+    )}
+    <BigCta />
+    <Newsletter />
+  </Base>
+) : (
+  <Base
+    title={`Agenda ${agendaPoles[pole!].label} | UNi’SONS`}
+    description={fitDescription(`${agendaPoles[pole!].intro} Dates, lieux et fiches des prochains rendez-vous.`)}
+    crumb={agendaPoles[pole!].label}
+  >
+    <AgendaListing pole={pole} />
+    <BigCta />
+    <Newsletter />
+  </Base>
+)}
+
+<style>
+  .head { padding: 170px var(--pad) 40px; }
+  h1 { font-size: var(--text-6xl); line-height: 1.05; margin-top: 28px; }
+  .label a:hover, .label a:focus-visible { color: var(--accent-ink); }
+  .meta { margin-top: 24px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 20px 40px; margin-top: 36px; }
+  .share { background: none; border: 0; padding: 0; cursor: pointer; }
+  .hero { margin: 0; padding: 0 var(--pad); }
+  .hero :global(img) { display: block; width: 100%; aspect-ratio: 1320 / 709; object-fit: cover; }
+  .about { display: grid; grid-template-columns: 448px 1fr; padding-top: 90px; padding-bottom: 90px; }
+  .col { max-width: 760px; display: grid; gap: 18px; }
+  .col h2 { font-size: var(--text-5xl); line-height: 1.1; margin-bottom: 8px; }
+  .col p { font-size: 18px; line-height: 28px; }
+  .note { padding: 12px 16px; background: var(--bg-2); border-left: 3px solid var(--accent); font-size: 15px; line-height: 24px; }
+  dl { margin-top: 24px; border-top: 1px solid var(--line); }
+  dl > div { display: grid; grid-template-columns: 200px 1fr; gap: 24px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  dt { font: 500 13px/24px var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--strong); }
+  dd { margin: 0; }
+  .more { margin-top: 16px; }
+  .next { background: var(--bg-2); }
+  .next h2 { font-size: var(--text-5xl); line-height: 1.1; margin: 20px 0 40px; }
+  .next .list { max-width: 920px; }
+  .all { margin-top: 40px; }
+  @media (max-width: 1100px) { .about { grid-template-columns: 1fr; gap: 24px; padding-block: 64px; } }
+  @media (max-width: 900px) {
+    .head { padding-top: 120px; }
+    dl > div { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('.share');
+  const status = document.querySelector<HTMLElement>('.share-status');
+  btn?.addEventListener('click', async () => {
+    const data = { title: btn.dataset.title ?? document.title, url: location.href };
+    try {
+      if (navigator.share) { await navigator.share(data); return; }
+      await navigator.clipboard.writeText(data.url);
+      if (status) status.textContent = 'Lien copié dans le presse-papiers.';
+    } catch { /* partage annulé */ }
+  });
+</script>

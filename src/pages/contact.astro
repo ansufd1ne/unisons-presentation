@@ -1,0 +1,101 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import BigCta from '../components/BigCta.astro';
+import Newsletter from '../components/Newsletter.astro';
+import { site } from '../data/site';
+// Endpoint du formulaire (Formspree, Brevo, etc.) : variable PUBLIC_CONTACT_ENDPOINT. Sans endpoint, le message s'ouvre dans le logiciel de messagerie.
+const endpoint = import.meta.env.PUBLIC_CONTACT_ENDPOINT ?? '';
+const schema = [{ '@type': 'ContactPage', name: 'Contact UNi’SONS', url: `${site.url}/contact`, about: { '@id': `${site.url}/#org` } }];
+---
+<Base
+  title="Contact | Écrire à UNi’SONS, Montpellier"
+  description="Contactez UNi’SONS à Montpellier : formulaire, téléphone 04 67 10 06 79, e-mail administration@unisons.fr et adresse de l’association, aux Hauts de Massane."
+  schema={schema}
+>
+  <PageHead label="Contact" title="Écrivez-nous" sub="Une question, un projet, une inscription à un atelier ?" align="left" />
+  <section class="wrap section">
+    <div class="info">
+      <p class="label" data-reveal="left">Coordonnées</p>
+      <address data-reveal="bottom">
+        <p><strong>UNi’SONS, L’art est public</strong><br />475 avenue du Comté de Nice<br />34080 Montpellier</p>
+        <p><a href="tel:+33467100679">04 67 10 06 79</a><br /><a href="mailto:administration@unisons.fr">administration@unisons.fr</a></p>
+        <p>Réservations : <a href="tel:+33499770017">04 99 77 00 17</a></p>
+        <p class="more"><a class="bracket" href="/infos-pratiques">Comment venir</a></p>
+      </address>
+    </div>
+    <form id="contact-form" method="post" action={endpoint || undefined} data-endpoint={endpoint} novalidate data-reveal="bottom" data-reveal-delay="120">
+      <p class="note">Les champs marqués d’un astérisque sont obligatoires.</p>
+      <div class="two">
+        <div class="f"><label for="c-name">Nom et prénom<span class="req" aria-hidden="true"> *</span></label><input id="c-name" name="name" autocomplete="name" required /></div>
+        <div class="f"><label for="c-mail">Adresse e-mail<span class="req" aria-hidden="true"> *</span></label><input id="c-mail" name="email" type="email" autocomplete="email" required /></div>
+      </div>
+      <div class="f"><label for="c-msg">Message<span class="req" aria-hidden="true"> *</span></label><textarea id="c-msg" name="message" rows="7" required></textarea></div>
+      <input type="text" name="website" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true" />
+      <label class="consent"><input type="checkbox" name="consent" required data-error-label="Consentement à l’utilisation des informations" /> <span>J’accepte que ces informations servent à me répondre. <a href="/politique-de-confidentialite">Politique de confidentialité</a><span class="req" aria-hidden="true"> *</span></span></label>
+      <button class="send" type="submit"><span>Envoyer</span></button>
+      <div class="fs">
+        <p class="fs-info" role="status" aria-live="polite" hidden><svg class="ic ic-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m7.5 12.5 3 3 6-6.5" /></svg><span class="fs-msg"></span></p>
+        <p class="fs-error" role="alert" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 2.4 17.5A2 2 0 0 0 4.1 20.5h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /><path d="M12 9.5v4M12 17h.01" /></svg><span class="fs-msg"></span></p>
+      </div>
+    </form>
+  </section>
+  <BigCta />
+  <Newsletter />
+</Base>
+
+<style>
+  .wrap { display: grid; grid-template-columns: 448px 1fr; gap: 0; padding-block: 24px 100px; }
+  .info { display: grid; align-content: start; gap: 24px; padding-right: 40px; }
+  address { font-style: normal; display: grid; gap: 18px; font-size: 18px; line-height: 28px; }
+  address a:not(.bracket) { text-decoration: underline; text-underline-offset: 3px; }
+  address a:not(.bracket):hover { color: var(--accent-ink); }
+  form { display: grid; gap: 22px; max-width: 760px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .f { display: grid; gap: 8px; }
+  label { font: 500 13px/1 var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--strong); }
+  input:not([type='checkbox']), textarea { width: 100%; padding: 14px 0; background: transparent; border: 0; border-bottom: 1px solid var(--ink); border-radius: 0; font: 400 18px/26px var(--font-body); color: var(--ink); resize: vertical; }
+  input:not([type='checkbox']):focus-visible, textarea:focus-visible { outline: none; border-bottom-width: 3px; border-bottom-color: var(--accent-ink); }
+  .note { font: 400 14px/22px var(--font-body); color: var(--text); }
+  .req { color: var(--accent-ink); font-weight: 700; }
+  input[aria-invalid='true'], textarea[aria-invalid='true'] { border-bottom: 3px solid #b3261e; }
+  .hp { position: absolute; left: -9999px; }
+  .consent { display: flex; gap: 12px; align-items: flex-start; font: 400 14px/22px var(--font-body); letter-spacing: 0; text-transform: none; color: var(--text); }
+  .consent input { flex: none; width: 20px; height: 20px; accent-color: var(--ink); }
+  .consent a { text-decoration: underline; text-underline-offset: 3px; }
+  .send { justify-self: start; display: flex; align-items: center; justify-content: center; height: 56px; min-width: 160px; padding: 0 28px; background: var(--ink); border: 0; border-radius: 32px; cursor: pointer; }
+  .send span { font: 500 15px/20px var(--font-body); color: var(--accent); }
+  .send:hover, .send:focus-visible { background: var(--accent); }
+  .send:hover span, .send:focus-visible span { color: var(--ink); }
+  .fs-info { color: var(--accent-ink); }
+  .send:disabled { opacity: .65; cursor: progress; }
+  .send:disabled:hover { background: var(--ink); }
+  .send:disabled:hover span { color: var(--accent); }
+  @media (max-width: 1100px) { .wrap { grid-template-columns: 1fr; gap: 48px; } .info { padding-right: 0; } }
+  @media (max-width: 600px) { .two { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  import { initForm } from '../scripts/form-submit';
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  if (form) initForm({
+    form,
+    honeypot: 'website',
+    endpoint: form.dataset.endpoint || undefined,
+    messages: {
+      busy: 'Envoi en cours…',
+      retry: 'Réessayer',
+      progress: 'Envoi en cours…',
+      ok: 'Merci, votre message est bien envoyé. Nous vous répondons rapidement.',
+      failed: 'Votre message n’a pas été envoyé. Il est conservé dans le formulaire : cliquez sur «\u00a0Réessayer\u00a0», ou écrivez-nous directement à administration@unisons.fr.',
+      timeout: 'L’envoi prend trop de temps (plus de 15 secondes). Votre message est conservé : vérifiez votre connexion puis cliquez sur «\u00a0Réessayer\u00a0», ou écrivez-nous à administration@unisons.fr.',
+      wait: 'Merci de patienter quelques secondes avant un nouvel envoi.',
+    },
+    // Pas encore de service d'envoi : le message est préparé dans le logiciel de messagerie, sans annoncer d'envoi réussi
+    onNoEndpoint: (d) => {
+      const body = `${d.get('message')}\n\n${d.get('name')} (${d.get('email')})`;
+      location.href = `mailto:administration@unisons.fr?subject=${encodeURIComponent('Message depuis unisons.fr')}&body=${encodeURIComponent(body)}`;
+      return 'Ce formulaire n’envoie pas encore directement les messages. Votre messagerie s’ouvre avec le message prêt : à vous de l’envoyer. Si rien ne s’ouvre, écrivez-nous à administration@unisons.fr.';
+    },
+  });
+</script>

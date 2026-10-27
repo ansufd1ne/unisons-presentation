@@ -1,0 +1,92 @@
+---
+import '../data/nav-cms'; // doit rester le premier import de données : applique les rubriques Sanity à `nav` avant Navbar et Footer
+import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
+import { site, social, labelFor } from '../data/site';
+import interUrl from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import antonUrl from '@fontsource/anton/files/anton-latin-400-normal.woff2?url';
+
+const gaId = (import.meta.env.PUBLIC_GA_ID ?? '').trim();
+interface Props { title: string; description: string; image?: string; crumb?: string; noindex?: boolean; navDark?: boolean; schema?: object[]; }
+const { title, description, image = '/og-default.jpg', crumb, noindex = false, navDark = false, schema = [] } = Astro.props;
+const path = Astro.url.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const canonical = new URL(path, site.url).href;
+const ogImage = new URL(image, site.url).href;
+
+// Fil d'Ariane : chaque segment qui a une page dans le plan de site, puis la page courante
+const segs = path.split('/').filter(Boolean);
+const trail = segs.map((_, i) => '/' + segs.slice(0, i + 1).join('/'));
+const crumbs = trail
+  .map((href, i) => ({ href, name: i === trail.length - 1 ? crumb ?? labelFor(href) ?? title : labelFor(href) }))
+  .filter((c): c is { href: string; name: string } => !!c.name);
+const graph: object[] = [
+  { '@type': 'Organization', '@id': `${site.url}/#org`, name: site.org, url: site.url + '/',
+    logo: `${site.url}/logo-unisons.png`, telephone: '+33 4 67 10 06 79',
+    address: { '@type': 'PostalAddress', streetAddress: site.address[0], postalCode: '34080', addressLocality: 'Montpellier', addressCountry: 'FR' },
+    sameAs: [...social.map((s) => s.href), site.festival + '/'] },
+  { '@type': 'WebSite', '@id': `${site.url}/#site`, url: site.url + '/', name: site.name, inLanguage: 'fr-FR', publisher: { '@id': `${site.url}/#org` } },
+];
+if (segs.length) graph.push({ '@type': 'BreadcrumbList', itemListElement: [
+  { '@type': 'ListItem', position: 1, name: 'Accueil', item: site.url + '/' },
+  ...crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 2, name: c.name, item: new URL(c.href, site.url).href })),
+] });
+const jsonLd = { '@context': 'https://schema.org', '@graph': [...graph, ...schema] };
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="preload" href={interUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={antonUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" href="/favicon-64.png" type="image/png" sizes="64x64" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />
+    <script is:inline>
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('reveal-ready', 'intro-ready');
+    </script>
+    <noscript><style>#menu-open{display:none}</style></noscript>
+    {gaId && <meta name="ga-id" content={gaId} />}
+    <slot name="head" />
+  </head>
+  <body>
+    <div class="scroll-progress" aria-hidden="true"></div>
+    <a class="skip" href="#main">Aller au contenu</a>
+    <Navbar dark={navDark} />
+    <main id="main" tabindex="-1"><slot /></main>
+    <script is:inline>
+      // Premier écran : ce qui est déjà visible n'attend ni le script de page ni l'animation (LCP)
+      if (document.documentElement.classList.contains('reveal-ready')) {
+        var l = innerHeight * 0.95;
+        document.querySelectorAll('[data-reveal]').forEach(function (e) { if (e.getBoundingClientRect().top <= l) e.removeAttribute('data-reveal'); });
+      }
+    </script>
+    <Footer />
+    <ConsentBanner analytics={!!gaId} />
+    <script>
+      import '../scripts/letter-roll.ts';
+      import '../scripts/reveal.ts';
+      import '../scripts/intro.ts';
+      import '../scripts/scroll-fx.ts';
+      import '../scripts/view-cursor.ts';
+      import '../scripts/hscroll.ts';
+      import '../scripts/analytics.ts';
+    </script>
+  <div style="position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#CE9E31;color:#000;font:600 13px/1.3 system-ui;padding:6px 12px;text-align:center;pointer-events:none">VERSION DÉMO : les pages vides sont remplies avec des contenus d’exemple</div>
+</body>
+</html>

@@ -1,0 +1,60 @@
+---
+import { Picture } from 'astro:assets';
+import { weekly } from '../data/home';
+---
+<section class="showcase section" aria-labelledby="weekly-title" data-hscroll>
+  <div class="pin" data-hscroll-pin>
+    <div class="head">
+      <p class="label" data-reveal="bottom">Chaque semaine</p>
+      <h2 id="weekly-title" class="display" data-reveal="bottom" data-reveal-delay="80">Rendez-vous hebdo</h2>
+      <p class="sub upper" data-reveal="bottom" data-reveal-delay="160">Exposition, espace de vie sociale, session hip-hop et atelier numérique.</p>
+    </div>
+    <div class="viewport" data-reveal="bottom" data-reveal-delay="240">
+      <div class="track" data-hscroll-track tabindex="0" role="region" aria-label="Rendez-vous de la semaine">
+        {weekly.map((it) => (
+          <article class="card">
+            <div class="t">
+              <h3 class="display">{it.title}</h3>
+              <p class="upper">{it.text}</p>
+              <a class="bracket" href={it.href}>Voir plus</a>
+            </div>
+            <a class="img-wrap" data-view href={it.href} tabindex="-1" aria-hidden="true">
+              <span class="view" aria-hidden="true">Voir</span>
+              <Picture src={it.img} formats={['avif', 'webp']} fallbackFormat="webp" widths={[282, 564]} sizes="282px" alt={it.alt} loading="lazy" />
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .showcase { padding-block: 80px; background: var(--bg-2); }
+  h2 { font-size: var(--text-5xl); line-height: 1.1; margin-top: 28px; }
+  .sub { margin-top: 24px; }
+  .viewport { margin-top: 64px; }
+
+  /* Repli (sans JavaScript, mobile, « réduire les animations ») : défilement horizontal natif, avec accroche */
+  .track { display: flex; gap: 0; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .track::-webkit-scrollbar { display: none; }
+  .card { display: flex; flex: 0 0 660px; scroll-snap-align: start; border-left: 1px solid var(--line); height: 290px; }
+  .t { width: 354px; padding: 0 24px; display: flex; flex-direction: column; gap: 16px; }
+  .t h3 { font-size: 32px; line-height: 1.2; }
+  .t .bracket { margin-top: auto; padding-bottom: 8px; }
+  .img-wrap { display: block; width: 282px; height: 290px; }
+  .img-wrap :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  /* Mode épinglé (classe posée par src/scripts/hscroll.ts) : la section reste à l'écran pendant que le
+     scroll vertical fait glisser les cartes vers la gauche ; une fois la dernière carte visible, la page repart. */
+  .showcase.hs-on { height: calc(100vh + var(--hs-distance, 0px)); padding: 0; }
+  .hs-on .pin { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 0 var(--pad); }
+  .hs-on .track { overflow: visible; scroll-snap-type: none; will-change: transform; }
+
+  @media (max-width: 900px) {
+    .card { flex: 0 0 88%; flex-direction: column; height: auto; border-left: 0; border-top: 1px solid var(--line); padding-top: 20px; margin-right: 16px; }
+    .t { width: auto; padding: 0 0 20px; }
+    .img-wrap { width: 100%; height: auto; aspect-ratio: 1/1; }
+    .showcase { padding-block: 56px; }
+  }
+</style>

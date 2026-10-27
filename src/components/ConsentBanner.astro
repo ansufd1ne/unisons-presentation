@@ -1,0 +1,94 @@
+---
+// Boîte de dialogue de choix, affichée à la première visite : mesure d'audience (si un identifiant Google Analytics est défini
+// au build) et contenus externes (carte Google Maps, vidéos YouTube). Le site ne dépose aucun cookie publicitaire.
+interface Props { analytics?: boolean; }
+const { analytics = false } = Astro.props;
+---
+<div class="consent" id="consent" role="dialog" aria-modal="false" aria-labelledby="consent-title" aria-describedby="consent-text" hidden>
+  <h2 id="consent-title">Vos choix sur les cookies</h2>
+  <p id="consent-text">
+    Ce site retient votre choix dans votre navigateur et ne dépose aucun cookie publicitaire.
+    Avec votre accord, il {analytics ? "mesure la fréquentation du site (Google Analytics) et " : ""}affiche la carte Google Maps et lit les vidéos YouTube sur la page. Votre choix est gardé 6 mois sur cet appareil et reste modifiable en bas de page.
+    {" "}<a href="/politique-de-confidentialite">Politique de confidentialité</a>
+  </p>
+  <div class="custom" id="consent-custom" hidden>
+    <fieldset>
+      <legend class="visually-hidden">Choix par catégorie</legend>
+      <label class="row"><input type="checkbox" checked disabled /><span><strong>Nécessaires</strong>Mémoriser ce choix. Toujours actifs, ils ne transmettent rien à un tiers.</span></label>
+      {analytics && <label class="row"><input type="checkbox" name="analytics" /><span><strong>Mesure d’audience</strong>Google Analytics compte les visites et les pages vues, sans publicité. Google reçoit votre adresse IP et dépose des cookies.</span></label>}
+      <label class="row"><input type="checkbox" name="media" /><span><strong>Contenus externes</strong>La carte Google Maps et les vidéos YouTube lues sur la page. Google reçoit votre adresse IP et peut déposer des cookies. Sans accord, la carte reste masquée et les vidéos s’ouvrent sur YouTube.</span></label>
+    </fieldset>
+    <p class="nl">Newsletter : aucun cookie. Votre adresse e-mail n’est transmise à notre prestataire d’envoi qu’au moment où vous validez le formulaire, avec votre case de consentement.</p>
+  </div>
+  <div class="actions">
+    <button type="button" class="refuse" data-consent="none">Tout refuser</button>
+    <button type="button" class="more" id="consent-more" aria-expanded="false" aria-controls="consent-custom">Personnaliser</button>
+    <button type="button" class="save" id="consent-save" hidden>Enregistrer mes choix</button>
+    <button type="button" class="accept" data-consent="all">Tout accepter</button>
+  </div>
+</div>
+
+<style>
+  .consent[hidden], .custom[hidden], .actions [hidden] { display: none; }
+  .consent { position: fixed; z-index: 90; left: 0; right: 0; margin: 0 auto; bottom: 20px; width: min(560px, calc(100vw - 40px)); max-height: calc(100vh - 40px); overflow-y: auto; background: var(--dark); color: var(--on-dark); border: 1px solid #3a3a35; padding: 24px; box-shadow: 0 12px 40px rgba(0, 0, 0, .35); }
+  h2 { font: 400 22px/1.1 var(--font-display); text-transform: uppercase; letter-spacing: .01em; color: var(--accent); margin: 0 0 12px; }
+  p { margin: 0; font-size: 14px; line-height: 22px; color: var(--on-dark); }
+  p a { color: var(--on-dark); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+  p a:hover, p a:focus-visible { color: var(--accent); }
+  .custom { margin-top: 16px; border-top: 1px solid #3a3a35; padding-top: 14px; }
+  fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .row { display: grid; grid-template-columns: 22px 1fr; gap: 12px; align-items: start; font-size: 13px; line-height: 20px; color: var(--on-dark); cursor: pointer; }
+  .row strong { display: block; font-size: 14px; color: #fff; margin-bottom: 2px; }
+  .row input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--accent); }
+  .nl { margin-top: 14px; font-size: 12px; line-height: 19px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  button { flex: 1 1 120px; font: 600 12px/1.2 var(--font-body); letter-spacing: .1em; text-transform: uppercase; padding: 14px 12px; cursor: pointer; border: 2px solid var(--accent); background: transparent; color: var(--on-dark); }
+  .accept, .save { background: var(--accent); color: var(--ink); }
+  button:hover, button:focus-visible { background: #fff; border-color: #fff; color: var(--ink); }
+  .consent :focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+  @media (max-width: 560px) { .consent { left: 12px; right: 12px; margin: 0; bottom: 12px; width: auto; padding: 20px; max-height: calc(100vh - 24px); } }
+  @media (prefers-reduced-motion: no-preference) { .consent:not([hidden]) { animation: consent-in .35s ease-out; } }
+  @keyframes consent-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+</style>
+
+<script>
+  import { getChoices, setChoices } from '../scripts/consent';
+  const box = document.getElementById('consent');
+  if (box) {
+    const custom = document.getElementById('consent-custom') as HTMLElement;
+    const more = document.getElementById('consent-more') as HTMLButtonElement;
+    const save = document.getElementById('consent-save') as HTMLButtonElement;
+    const boxes = Array.from(box.querySelectorAll<HTMLInputElement>('input[name]'));
+    const hasAnalytics = boxes.some((b) => b.name === 'analytics');
+    let opener: HTMLElement | null = null;
+
+    const fill = () => {
+      const c = getChoices();
+      boxes.forEach((b) => { b.checked = !!c && c[b.name as 'analytics' | 'media']; });
+    };
+    const panel = (open: boolean) => {
+      custom.hidden = !open;
+      more.setAttribute('aria-expanded', String(open));
+      save.hidden = !open;
+      more.hidden = open;
+    };
+    const show = () => { fill(); panel(false); box.hidden = false; };
+    const hide = () => { box.hidden = true; opener?.focus(); opener = null; };
+    const choose = (analytics: boolean, media: boolean) => { setChoices({ analytics: hasAnalytics && analytics, media }); hide(); };
+
+    if (getChoices() === null) show();
+    box.querySelector('[data-consent="none"]')?.addEventListener('click', () => choose(false, false));
+    box.querySelector('[data-consent="all"]')?.addEventListener('click', () => choose(true, true));
+    more.addEventListener('click', () => { panel(true); (boxes.find((b) => !b.disabled) ?? save).focus(); });
+    save.addEventListener('click', () => choose(boxes.some((b) => b.name === 'analytics' && b.checked), boxes.some((b) => b.name === 'media' && b.checked)));
+    box.addEventListener('keydown', (e) => { if (e.key === 'Escape') hide(); });
+    document.addEventListener('click', (e) => {
+      const t = (e.target as HTMLElement).closest<HTMLElement>('[data-consent-open]');
+      if (!t) return;
+      e.preventDefault();
+      opener = t;
+      show();
+      box.querySelector<HTMLButtonElement>('.accept')?.focus();
+    });
+  }
+</script>

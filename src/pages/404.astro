@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Page introuvable | UNi’SONS" description="Cette page n’existe pas ou a été déplacée. Retrouvez l’agenda, les actions et les coordonnées d’UNi’SONS depuis l’accueil du site." noindex>
+  <section class="nf">
+    <p class="label">Erreur 404</p>
+    <h1 class="display">Page introuvable</h1>
+    <p>Cette page n’existe pas ou a été déplacée.</p>
+    <p class="links"><a class="bracket" href="/">Accueil</a><a class="bracket" href="/agenda">Agenda</a><a class="bracket" href="/contact">Contact</a></p>
+  </section>
+</Base>
+
+<style>
+  .nf { padding: 190px var(--pad) 140px; display: grid; gap: 24px; justify-items: start; min-height: 70vh; }
+  h1 { font-size: var(--text-6xl); line-height: 1.05; }
+  .links { display: flex; flex-wrap: wrap; gap: 32px; margin-top: 16px; }
+</style>

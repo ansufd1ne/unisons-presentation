@@ -1,0 +1,50 @@
+---
+import { agendaPoles, monthKey, monthLabel, type Evt } from '../data/events';
+interface Props { current?: string; list: Evt[]; }
+const { current = 'tous', list } = Astro.props;
+const months = [...new Set(list.map((e) => monthKey(e.date)))].sort();
+const poleLinks = [{ id: 'tous', label: 'Tous', href: '/agenda' }, ...Object.entries(agendaPoles).map(([id, p]) => ({ id, label: p.label, href: p.href }))];
+---
+<div class="filters">
+  <nav aria-label="Filtrer par lieu ou programme">
+    <ul>
+      {poleLinks.map((p) => <li><a href={p.href} aria-current={p.id === current ? 'page' : undefined}>{p.label}</a></li>)}
+    </ul>
+  </nav>
+  {months.length > 1 && (
+    <div class="months" role="group" aria-label="Filtrer par mois" hidden>
+      <button type="button" data-month="" aria-pressed="true">Tous les mois</button>
+      {months.map((m) => <button type="button" data-month={m} aria-pressed="false">{monthLabel(m)}</button>)}
+    </div>
+  )}
+</div>
+
+<style>
+  .filters { display: grid; gap: 20px; padding: 0 var(--pad) 40px; }
+  ul { display: flex; flex-wrap: wrap; gap: 10px; }
+  a, button { display: inline-block; padding: 10px 18px; border: 1px solid var(--ink); border-radius: 999px; font: 500 13px/1 var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--ink); background: transparent; cursor: pointer; transition: background .2s, color .2s; }
+  a:hover, a:focus-visible, button:hover, button:focus-visible { background: var(--accent); border-color: var(--accent); }
+  a[aria-current='page'], button[aria-pressed='true'] { background: var(--ink); color: var(--accent); }
+  .months { display: flex; flex-wrap: wrap; gap: 10px; }
+  .months[hidden] { display: none; }
+  .months button { border-color: var(--line); text-transform: none; letter-spacing: .02em; font-size: 14px; }
+  .months button[aria-pressed='true'] { border-color: var(--ink); }
+</style>
+
+<script>
+  const wrap = document.querySelector<HTMLElement>('.months');
+  if (wrap) {
+    wrap.hidden = false; // le filtre par mois n'existe qu'avec JavaScript
+    const btns = [...wrap.querySelectorAll<HTMLButtonElement>('button')];
+    const rows = [...document.querySelectorAll<HTMLElement>('[data-month].row')];
+    const groups = [...document.querySelectorAll<HTMLElement>('[data-group]')];
+    const live = document.getElementById('filter-status');
+    btns.forEach((b) => b.addEventListener('click', () => {
+      const m = b.dataset.month ?? '';
+      btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      rows.forEach((r) => { r.hidden = !!m && r.dataset.month !== m; });
+      groups.forEach((g) => { g.hidden = !!m && g.dataset.group !== m; });
+      if (live) live.textContent = m ? `${rows.filter((r) => !r.hidden).length} événement(s) affiché(s)` : 'Tous les événements sont affichés';
+    }));
+  }
+</script>

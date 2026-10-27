@@ -1,0 +1,71 @@
+---
+import { Picture } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import BigCta from '../../components/BigCta.astro';
+import Newsletter from '../../components/Newsletter.astro';
+import { pastExpos } from '../../data/expos';
+import { picProps, widthsFor } from '../../lib/cms';
+import { fitDescription } from '../../lib/seo';
+// Textes affichés comme du texte (jamais en HTML), qu'ils viennent de Sanity ou du contenu local.
+const withPhotos = pastExpos.filter((x) => x.photos.length > 0);
+const names = pastExpos.slice(0, 3).map((x) => x.title).join(', ') + (pastExpos.length > 3 ? ' et d’autres' : '');
+const description = fitDescription(pastExpos.length ? `${names} : retrouvez les expositions qui se sont tenues à la galerie de L’art est public, à Montpellier.` : 'Les expositions passées de la galerie de L’art est public, à Montpellier : affiches, photographies et présentations de chaque rétrospective.');
+const schema = [{ '@type': 'ItemList', name: 'Expositions passées de L’art est public', itemListElement: pastExpos.map((x, i) => ({ '@type': 'ListItem', position: i + 1, name: x.title })) }];
+---
+<Base
+  title="Rétrospectives | Les expositions passées de la galerie | UNi’SONS"
+  description={description}
+  schema={schema}
+>
+  <PageHead label="L’art est public" title="Rétrospectives" sub="Les expositions passées de la galerie" align="left" />
+  <section class="list section" aria-label="Expositions passées">
+    {pastExpos.length === 0 && <p class="empty">Aucune exposition passée pour l’instant.</p>}
+    {pastExpos.map((x, xi) => (
+      <article class="item" id={x.slug} data-reveal="bottom">
+        {x.image ? <Picture {...picProps(x.image)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(x.image, [400, 800])} sizes="(max-width: 900px) 100vw, 400px" alt={x.alt ?? ''} loading={xi === 0 ? 'eager' : 'lazy'} /> : <div class="ph" aria-hidden="true">{x.title.slice(0, 1)}</div>}
+        <div class="txt">
+          <h2 class="display">{x.title}{x.year && <span class="yr"> · {x.year}</span>}</h2>
+          <p>{x.text}</p>
+        </div>
+      </article>
+    ))}
+  </section>
+
+  {withPhotos.map((x, n) => (
+    <section class="rewind section" aria-labelledby={`${x.slug}-t`}>
+      <p class="label" data-reveal="left">En images</p>
+      <h2 id={`${x.slug}-t`} class="display" data-reveal="bottom">{x.title}{x.year && `, ${x.year}`}</h2>
+      <ul class="shots">
+        {x.photos.map((p) => (
+          <li data-reveal="bottom"><Picture {...picProps(p.src)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(p.src, [480, 800, 1200])} sizes="(max-width: 900px) 100vw, 430px" alt={p.alt} loading="lazy" /></li>
+        ))}
+      </ul>
+      {n === withPhotos.length - 1 && <p class="back"><a class="bracket" href="/l-art-est-public/galerie">Retour à la galerie</a></p>}
+    </section>
+  ))}
+  {withPhotos.length === 0 && <p class="back-only"><a class="bracket" href="/l-art-est-public/galerie">Retour à la galerie</a></p>}
+  <BigCta />
+  <Newsletter />
+</Base>
+
+<style>
+  .list { padding-top: 24px; display: grid; }
+  .item { display: grid; grid-template-columns: 400px 1fr; gap: 48px; align-items: center; padding: 32px 0; border-top: 1px solid var(--line); }
+  .item :global(img), .ph { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .ph { display: grid; place-items: center; background: var(--ink); color: var(--accent); font: 400 120px/1 var(--font-display); }
+  h2 { font-size: var(--text-4xl); line-height: 1.1; }
+  .yr { color: var(--accent-ink); }
+  .txt p { margin-top: 16px; max-width: 560px; font-size: 18px; line-height: 28px; }
+  .rewind { background: var(--bg-2); }
+  .rewind h2 { font-size: var(--text-5xl); line-height: 1.1; margin: 20px 0 40px; }
+  .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .shots :global(img) { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+  .back { margin-top: 40px; }
+  .empty { padding: 32px 0; font-size: 18px; border-top: 1px solid var(--line); }
+  .back-only { padding: 0 var(--pad) 72px; }
+  @media (max-width: 900px) {
+    .item { grid-template-columns: 1fr; gap: 20px; }
+    .shots { grid-template-columns: 1fr; }
+  }
+</style>

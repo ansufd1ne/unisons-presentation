@@ -1,0 +1,229 @@
+{
+  "evenements": [
+    {
+      "slug": "halim-mahmoudi",
+      "title": "Halim Mahmoudi",
+      "date": "2026-11-05",
+      "pole": "l-art-est-public",
+      "venue": "Montpellier",
+      "free": false,
+      "summary": "Rendez-vous de l’agenda d’UNi’SONS, jeudi 5 novembre 2026.",
+      "body": "Texte provisoire. La présentation de l’artiste, le lieu exact et l’horaire seront ajoutés à cette fiche dès réception des informations.",
+      "practical": [],
+      "provisional": true,
+      "alt": "Ambiance d’un concert UNi’SONS : le public lève les téléphones devant la scène",
+      "image": "src/assets/photos/evt-halim.jpg",
+      "heroImage": "src/assets/photos/hero-halim.jpg"
+    },
+    {
+      "slug": "mehdi-badrou",
+      "title": "Mehdi & Badrou",
+      "date": "2026-11-10",
+      "pole": "l-art-est-public",
+      "venue": "Montpellier",
+      "free": false,
+      "summary": "Rendez-vous de l’agenda d’UNi’SONS, mardi 10 novembre 2026.",
+      "body": "Texte provisoire. La présentation de l’artiste, le lieu exact et l’horaire seront ajoutés à cette fiche dès réception des informations.",
+      "practical": [],
+      "provisional": true,
+      "alt": "Un artiste sur la scène d’une salle UNi’SONS",
+      "image": "src/assets/photos/evt-mehdi.jpg",
+      "heroImage": "src/assets/photos/hero-mehdi.jpg"
+    },
+    {
+      "slug": "guerta-ekloz",
+      "title": "Guerta + Ekloz",
+      "date": "2026-11-26",
+      "pole": "l-art-est-public",
+      "venue": "Montpellier",
+      "free": false,
+      "summary": "Rendez-vous de l’agenda d’UNi’SONS, jeudi 26 novembre 2026.",
+      "body": "Texte provisoire. La présentation de l’artiste, le lieu exact et l’horaire seront ajoutés à cette fiche dès réception des informations.",
+      "practical": [],
+      "provisional": true,
+      "alt": "Ekloz au micro, en maillot rose et marron",
+      "image": "src/assets/photos/evt-ekloz.jpg",
+      "heroImage": "src/assets/photos/hero-ekloz.jpg"
+    },
+    {
+      "slug": "hommage-mahmoud-darwich",
+      "title": "Hommage à Mahmoud Darwich",
+      "date": "2026-12-03",
+      "endDate": "2027-05-03",
+      "pole": "l-art-est-public",
+      "venue": "La galerie, L’art est public",
+      "address": "475 avenue du Comté de Nice, 34080 Montpellier",
+      "free": true,
+      "summary": "Vernissage de l’exposition d’Ernest Pignon-Ernest, à la galerie de L’art est public, du 3 décembre 2026 au 3 mai 2027.",
+      "body": "L’artiste cherche à bousculer les mentalités et à ouvrir les regards sur les réalités du monde en collant, dans les rues des villes et des villages à travers le monde, des sérigraphies grandeur nature issues de ses dessins.\n\nLes photographies de ces collages, progressivement altérés par le temps, constituent de véritables « mémoires de l’éphémère », témoignant à la fois de la fragilité de l’œuvre et de la permanence de son message.",
+      "practical": [
+        {
+          "label": "Exposition",
+          "value": "Du 3 décembre 2026 au 3 mai 2027"
+        },
+        {
+          "label": "Horaires",
+          "value": "Du lundi au vendredi, de 14h30 à 18h00. Le premier samedi du mois sous réservation"
+        },
+        {
+          "label": "Entrée",
+          "value": "Libre"
+        }
+      ],
+      "provisional": false,
+      "alt": "Collage d’Ernest Pignon-Ernest représentant Mahmoud Darwich sur un mur en Palestine",
+      "image": "src/assets/photos/evt-darwich.jpg",
+      "heroImage": "src/assets/photos/expo-darwich-1.jpg"
+    }
+  ],
+  "membres": [
+    {
+      "slug": "fadelha-benammar-koly",
+      "name": "Fadelha Benammar-Koly",
+      "role": "Présidente",
+      "groupe": "Présidence et direction",
+      "order": 0,
+      "email": "f.benammar@unisons.fr",
+      "photo": "src/assets/photos/team-fadelha.jpg"
+    },
+    {
+      "slug": "habib-dechraoui",
+      "name": "Habib Dechraoui",
+      "role": "Directeur général",
+      "groupe": "Présidence et direction",
+      "order": 1,
+      "email": "h.dechraoui@unisons.fr",
+      "photo": "src/assets/photos/team-habib.jpg"
+    },
+    {
+      "slug": "amandine-thomas",
+      "name": "Amandine Thomas",
+      "role": "Assistante du directeur",
+      "groupe": "Présidence et direction",
+      "order": 2,
+      "email": "a.thomas@unisons.fr",
+      "photo": "src/assets/photos/team-amandine.jpg"
+    },
+    {
+      "slug": "florian-oliveres",
+      "name": "Florian Oliveres",
+      "role": "Directeur délégué",
+      "groupe": "Présidence et direction",
+      "order": 3,
+      "email": "f.oliveres@unisons.fr",
+      "photo": "src/assets/photos/team-florian.jpg"
+    },
+    {
+      "slug": "estelle-bardiot",
+      "name": "Estelle Bardiot",
+      "role": "Directrice administrative et financière",
+      "groupe": "Administration",
+      "order": 0,
+      "email": "e.bardiot@unisons.fr",
+      "photo": "src/assets/photos/team-estelle.jpg"
+    },
+    {
+      "slug": "delhia-prothon-djob",
+      "name": "Delhia Prothon Djob",
+      "role": "Chargée de communication",
+      "groupe": "Communication",
+      "order": 0,
+      "email": "d.prothon@unisons.fr",
+      "photo": "src/assets/photos/team-delhia.jpg"
+    },
+    {
+      "slug": "evan-drammeh",
+      "name": "Evan Drammeh",
+      "role": "Alternant en communication",
+      "groupe": "Communication",
+      "order": 1,
+      "photo": "src/assets/photos/team-evan.jpg"
+    },
+    {
+      "slug": "marina-da-silva",
+      "name": "Marina Da Silva",
+      "role": "Service civique en vidéo",
+      "groupe": "Communication",
+      "order": 2,
+      "photo": "src/assets/photos/team-marina.jpg"
+    },
+    {
+      "slug": "nasser-benammar",
+      "name": "Nasser Benammar",
+      "role": "Conseiller socio-éducatif",
+      "groupe": "Cohésion sociale",
+      "order": 0,
+      "email": "n.benammar@unisons.fr",
+      "photo": "src/assets/photos/team-nasser.jpg"
+    },
+    {
+      "slug": "malika-aboubeker",
+      "name": "Malika Aboubeker",
+      "role": "Médiatrice culturelle et sociale",
+      "groupe": "Médiation culturelle et sociale",
+      "order": 0,
+      "email": "m.aboubeker@unisons.fr",
+      "photo": "src/assets/photos/team-malika.jpg"
+    },
+    {
+      "slug": "yohaquim-faafae",
+      "name": "Yohaquim Faafae",
+      "role": "Médiateur culturel et social",
+      "groupe": "Médiation culturelle et sociale",
+      "order": 1,
+      "photo": "src/assets/photos/team-yohaquim.jpg"
+    },
+    {
+      "slug": "karim-larbi-cherif",
+      "name": "Karim Larbi Cherif",
+      "role": "Médiateur culturel et social",
+      "groupe": "Médiation culturelle et sociale",
+      "order": 2,
+      "email": "k.larbicherif@unisons.fr",
+      "photo": "src/assets/photos/team-karim.jpg"
+    },
+    {
+      "slug": "eloise-renard",
+      "name": "Eloïse Renard",
+      "role": "Chargée d’accompagnement socio-professionnel des musiciens",
+      "groupe": "Insertion et formation",
+      "order": 0,
+      "email": "e.renard@unisons.fr",
+      "photo": "src/assets/photos/team-eloise.jpg"
+    },
+    {
+      "slug": "chloe-didier",
+      "name": "Chloé Didier",
+      "role": "Chargée de l’action éducative artistique et culturelle",
+      "groupe": "Actions éducatives",
+      "order": 0,
+      "email": "c.didier@unisons.fr",
+      "photo": "src/assets/photos/team-chloe.jpg"
+    },
+    {
+      "slug": "abdou-bayou",
+      "name": "Abdou Bayou",
+      "role": "Service éducatif",
+      "groupe": "Actions éducatives",
+      "order": 1,
+      "photo": "src/assets/photos/team-abdou.jpg"
+    },
+    {
+      "slug": "lionel-serin",
+      "name": "Lionel Serin",
+      "role": "Référent des ateliers",
+      "groupe": "Ateliers hip-hop",
+      "order": 0,
+      "email": "l.serin@unisons.fr",
+      "photo": "src/assets/photos/team-lionel.jpg"
+    },
+    {
+      "slug": "titouan-ramade",
+      "name": "Titouan Ramade",
+      "role": "Technicien du son",
+      "groupe": "Ateliers hip-hop",
+      "order": 1,
+      "photo": "src/assets/photos/team-titouan.jpg"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+---
+import EventRow from './EventRow.astro';
+import { upcoming } from '../data/events';
+const list = upcoming().slice(0, 4);
+---
+<section class="agenda section" aria-labelledby="agenda-title">
+  <p class="label" data-reveal="bottom">Agenda</p>
+  <h2 id="agenda-title" class="display" data-reveal="bottom" data-reveal-delay="80">Nos rendez-vous</h2>
+  <p class="sub upper" data-reveal="bottom" data-reveal-delay="160">Concerts, rencontres et expositions à Montpellier.</p>
+  {list.length > 0 ? (
+    <div class="list">{list.map((e, i) => <EventRow e={e} eager={i === 0} />)}</div>
+  ) : (
+    <p class="empty">Aucun événement n’est programmé pour le moment. Revenez bientôt, ou inscrivez-vous à la newsletter.</p>
+  )}
+  <p class="all"><a class="bracket" href="/agenda">Tout l’agenda</a></p>
+</section>
+
+<style>
+  .agenda { padding-top: 110px; padding-bottom: 100px; }
+  h2 { font-size: var(--text-5xl); line-height: 1.1; margin-top: 28px; }
+  .sub { margin-top: 24px; }
+  .list { margin-top: 64px; max-width: 920px; margin-left: min(15.4vw, 222px); }
+  .all { margin-top: 48px; margin-left: min(15.4vw, 222px); }
+  .empty { margin-top: 48px; max-width: 560px; }
+  @media (max-width: 1100px) { .list, .all { margin-left: 0; max-width: none; } }
+  @media (max-width: 900px) { .agenda { padding-block: 56px; } }
+</style>

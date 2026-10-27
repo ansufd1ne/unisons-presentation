@@ -1,0 +1,26 @@
+{
+  "name": "unisons-studio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "export-seed": "node scripts/export-seed-data.mjs",
+    "export-pages": "node scripts/export-pages-list.mjs",
+    "seed": "sanity exec seed.ts --with-user-token",
+    "seed-rubriques": "sanity exec seed-rubriques.ts --with-user-token",
+    "backup": "sh scripts/backup.sh"
+  },
+  "dependencies": {
+    "@sanity/locale-fr-fr": "^1.2.37",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sanity": "^6.19.0",
+    "styled-components": "^6.1.15"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

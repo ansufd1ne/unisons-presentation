@@ -1,0 +1,52 @@
+---
+// Carte Google Maps. Elle n'est chargée qu'après l'accord du visiteur (boîte de dialogue des contenus externes)
+// ou sur demande avec le bouton : Google ne reçoit rien avant.
+interface Props { query: string; address: string; title?: string; }
+const { query, address, title = 'Carte Google Maps' } = Astro.props;
+const q = encodeURIComponent(query);
+const embed = `https://www.google.com/maps?q=${q}&z=16&hl=fr&output=embed`;
+const open = `https://www.google.com/maps/search/?api=1&query=${q}`;
+---
+<figure class="map section" data-reveal="bottom">
+  <div class="frame" data-map-src={embed} data-map-title={title}>
+    <div class="ph">
+      <p>La carte est fournie par Google. Elle ne s’affiche qu’avec votre accord : Google reçoit alors votre adresse IP et peut déposer des cookies.</p>
+      <button type="button" data-map-load>Afficher la carte</button>
+    </div>
+  </div>
+  <figcaption>Carte Google Maps. <a class="bracket" href={open} target="_blank" rel="noopener noreferrer">Ouvrir dans Google Maps<span class="visually-hidden"> (nouvel onglet), {address}</span></a></figcaption>
+</figure>
+
+<style>
+  .map { margin: 0; padding: 40px var(--pad); }
+  .frame { position: relative; aspect-ratio: 1320 / 600; background: var(--bg-2); border: 1px solid var(--line); overflow: hidden; }
+  .frame :global(iframe) { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .ph { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 20px; padding: 24px; text-align: center; }
+  .ph p { max-width: 520px; font-size: 15px; line-height: 24px; color: var(--text); }
+  .ph button { font: 600 13px/1.2 var(--font-body); letter-spacing: .12em; text-transform: uppercase; padding: 14px 22px; cursor: pointer; background: var(--dark); color: #fff; border: 2px solid var(--dark); }
+  .ph button:hover, .ph button:focus-visible { background: var(--accent); border-color: var(--accent); color: var(--ink); }
+  figcaption { margin-top: 12px; font-size: 13px; line-height: 20px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 20px; align-items: baseline; }
+  figcaption .bracket { font-size: 12px; }
+  @media (max-width: 900px) { .frame { aspect-ratio: 4 / 5; } }
+</style>
+
+<script>
+  import { hasConsent } from '../scripts/consent';
+  document.querySelectorAll<HTMLElement>('.frame[data-map-src]').forEach((frame) => {
+    let loaded = false;
+    const load = () => {
+      if (loaded) return;
+      loaded = true;
+      const f = document.createElement('iframe');
+      f.src = frame.dataset.mapSrc ?? '';
+      f.title = frame.dataset.mapTitle ?? 'Carte Google Maps';
+      f.loading = 'lazy';
+      f.referrerPolicy = 'no-referrer-when-downgrade';
+      f.allowFullscreen = true;
+      frame.replaceChildren(f);
+    };
+    if (hasConsent('media')) load();
+    document.addEventListener('consent-change', () => { if (hasConsent('media')) load(); });
+    frame.querySelector('[data-map-load]')?.addEventListener('click', load); // affichage ponctuel, sans mémoriser de choix
+  });
+</script>

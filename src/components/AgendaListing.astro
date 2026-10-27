@@ -1,0 +1,65 @@
+---
+import PageHead from './PageHead.astro';
+import AgendaFilters from './AgendaFilters.astro';
+import EventRow from './EventRow.astro';
+import { agendaPoles, upcoming, monthKey, monthLabel, type PoleId } from '../data/events';
+import { weekly } from '../data/home';
+import { Picture } from 'astro:assets';
+interface Props { pole?: PoleId; }
+const { pole } = Astro.props;
+const all = upcoming();
+const list = pole ? all.filter((e) => e.pole === pole) : all;
+const groups = [...new Set(list.map((e) => monthKey(e.date)))].sort().map((m) => ({ m, items: list.filter((e) => monthKey(e.date) === m) }));
+const info = pole ? agendaPoles[pole] : null;
+---
+<PageHead label="Agenda" title={info ? info.label : 'Agenda'} sub={info ? info.intro : 'Concerts, rencontres et expositions à Montpellier'} align="left" />
+<AgendaFilters current={pole ?? 'tous'} list={list} />
+<p id="filter-status" class="visually-hidden" aria-live="polite"></p>
+
+<div class="wrap">
+  {groups.length > 0 ? groups.map((g, gi) => (
+    <section class="grp" data-group={g.m} aria-labelledby={`m-${g.m}`}>
+      <h2 id={`m-${g.m}`} class="display month" data-reveal="bottom">{monthLabel(g.m)}</h2>
+      {g.items.map((e) => <EventRow e={e} eager={gi === 0 && e === g.items[0]} />)}
+    </section>
+  )) : (
+    <p class="empty">Aucun événement n’est annoncé pour le moment{info ? ` pour ${info.label}` : ''}. <a class="bracket" href="/agenda">Voir tout l’agenda</a></p>
+  )}
+</div>
+
+{!pole && (
+  <section class="weekly section" aria-labelledby="weekly-h">
+    <p class="label">Chaque semaine</p>
+    <h2 id="weekly-h" class="display">Rendez-vous réguliers</h2>
+    <ul class="wk">
+      {weekly.map((w, i) => (
+        <li data-reveal="bottom">
+          <a href={w.href} class="wk-img" tabindex="-1" aria-hidden="true"><Picture src={w.img} formats={['avif', 'webp']} fallbackFormat="webp" widths={[240, 480]} sizes="240px" alt="" loading="lazy" /></a>
+          <div><h3 class="display" id={`wk-${i}`}>{w.title}</h3><p class="upper">{w.text}</p></div>
+          <a class="bracket" href={w.href} aria-describedby={`wk-${i}`}>Voir plus</a>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
+<style>
+  .wrap { padding: 0 var(--pad) 60px; }
+  .grp { margin-bottom: 64px; }
+  .month { font-size: var(--text-4xl); line-height: 1.1; margin-bottom: 28px; }
+  .grp[hidden] { display: none; }
+  .empty { padding: 24px 0 80px; display: grid; gap: 20px; justify-items: start; max-width: 560px; }
+  .weekly { background: var(--bg-2); padding-block: 80px; }
+  .weekly h2 { font-size: var(--text-5xl); line-height: 1.1; margin: 20px 0 40px; }
+  .wk { display: grid; gap: 0; border-top: 1px solid var(--line); }
+  .wk li { display: grid; grid-template-columns: 180px 1fr auto; gap: 28px; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--line); }
+  .wk-img { display: block; width: 180px; height: 110px; }
+  .wk-img :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .wk h3 { font-size: 32px; line-height: 1.15; }
+  @media (max-width: 900px) {
+    .weekly { padding-block: 56px; }
+    .wk li { grid-template-columns: 96px 1fr; gap: 16px; }
+    .wk-img { width: 96px; height: 72px; }
+    .wk li > .bracket { grid-column: 2; }
+  }
+</style>

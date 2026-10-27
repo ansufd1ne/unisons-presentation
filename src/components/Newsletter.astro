@@ -1,0 +1,85 @@
+---
+import logo from '../assets/logo/unisons-blanc.svg';
+// Liste Brevo déjà utilisée par le site actuel (champs EMAIL, OPT_IN, email_address_check, locale).
+// Pour changer de liste : variable d'environnement PUBLIC_NEWSLETTER_ENDPOINT.
+const endpoint = import.meta.env.PUBLIC_NEWSLETTER_ENDPOINT ?? 'https://af694aaf.sibforms.com/serve/MUIFAH77SJMVX4J5xLfco_PNk9-GJj58xNOL_2_8OUIFEp4QrOWK0lIHCC0NgFwzcw4GSYEC4P-OAr8TYel6NCZW7whanl3IwzY_t4ukrS-S6n1h9JCscaq9C_YoYsYTiPMPqbCUmSWBcZ139fzRiJ6IfSfQ3dpl1mP_uQp4SO2cuY2bSsqQkwiTV7dMREDQ7oN_v8VTtoVMKTek';
+---
+<section class="news" aria-labelledby="news-title">
+  <div class="box" data-reveal="bottom">
+    <img class="logo" src={logo.src} alt="" width="131" height="28" aria-hidden="true" />
+    <h2 id="news-title" class="display gold">La newsletter de L’art est public</h2>
+    <p class="sub">Ne manquez aucun événement : inscrivez-vous à notre newsletter !</p>
+    <form class="form" id="newsletter-form" method="post" action={endpoint} data-endpoint={endpoint} novalidate>
+      <div class="field">
+        <label class="visually-hidden" for="news-email">Adresse e-mail</label>
+        <input id="news-email" name="EMAIL" type="email" required autocomplete="email" placeholder="Saisir votre e-mail" />
+        <input type="text" name="email_address_check" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true" />
+        <input type="hidden" name="locale" value="fr" />
+        <button class="send" type="submit"><span>S’inscrire</span></button>
+      </div>
+      <label class="consent"><input type="checkbox" name="OPT_IN" value="1" required data-error-label="Consentement" /> <span>J’accepte de recevoir les e-mails d’UNi’SONS et confirme avoir pris connaissance de la <a href="/politique-de-confidentialite">politique de confidentialité</a>.</span></label>
+    </form>
+    <div class="fs">
+      <p class="fs-info" role="status" aria-live="polite" hidden><svg class="ic ic-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m7.5 12.5 3 3 6-6.5" /></svg><span class="fs-msg"></span></p>
+      <p class="fs-error" role="alert" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 2.4 17.5A2 2 0 0 0 4.1 20.5h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" /><path d="M12 9.5v4M12 17h.01" /></svg><span class="fs-msg"></span></p>
+    </div>
+    <p class="rgpd">UNi’SONS, responsable du traitement, utilise Brevo pour envoyer cette newsletter : en vous inscrivant, vous acceptez que votre adresse e-mail soit transmise à Brevo, qui la traite selon sa <a href="https://www.brevo.com/fr/legal/privacypolicy/" target="_blank" rel="noopener noreferrer">politique de confidentialité<span class="visually-hidden"> (nouvel onglet)</span></a>. Elle est conservée jusqu’à votre désinscription, possible à tout moment depuis chaque message. Vous pouvez accéder à vos données, les rectifier ou les supprimer en écrivant à <a href="mailto:rgpd@unisons.fr">rgpd@unisons.fr</a>. Voir aussi notre <a href="/politique-de-confidentialite">politique de confidentialité</a>.</p>
+  </div>
+</section>
+
+<style>
+  .news { background: var(--dark); color: var(--on-dark); padding: 88px var(--pad); }
+  .box { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; gap: 18px; max-width: 860px; margin: 0 auto; }
+  .logo { height: 28px; width: auto; }
+  .title, h2 { font-size: clamp(32px, 5vw, 56px); line-height: 1.1; }
+  .sub { font-size: 18px; line-height: 26px; color: var(--on-dark); }
+  .form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; width: 100%; max-width: 672px; margin-top: 12px; }
+  .field { display: flex; align-items: center; gap: 8px; height: 68px; padding: 8px 8px 8px 22px; background: #fff; border-radius: 24px; }
+  .field input[name='EMAIL'] { flex: 1; min-width: 0; padding: 0; background: transparent; border: 0; font: 400 16px / 24px var(--font-body); color: #1a1a17; }
+  .field input[name='EMAIL']::placeholder { color: #5b5b53; opacity: 1; }
+  .field input[name='EMAIL']:focus-visible { outline: none; }
+  .field:focus-within { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .hp { position: absolute; left: -9999px; }
+  .send { flex: none; display: flex; align-items: center; justify-content: center; height: 52px; min-width: 120px; padding: 0 20px; background: var(--dark); border: 0; border-radius: 28px; cursor: pointer; }
+  .send span { font: 500 14px / 20px var(--font-body); color: var(--accent); white-space: nowrap; }
+  .send:hover, .send:focus-visible { background: var(--accent); }
+  .send:hover span, .send:focus-visible span { color: var(--dark); }
+  .send:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .consent { display: flex; align-items: flex-start; gap: 12px; text-align: left; font-size: 13px; line-height: 20px; color: #cfcec7; }
+  .consent input { flex: none; width: 20px; height: 20px; margin-top: 0; accent-color: var(--accent); }
+  .consent a { text-decoration: underline; text-underline-offset: 3px; }
+  .consent a:hover, .consent a:focus-visible { color: var(--accent); }
+  :global(.news :focus-visible) { outline-color: var(--accent); }
+  .fs { min-height: 24px; width: 100%; max-width: 672px; text-align: left; }
+  .fs-info { color: var(--accent); }
+  .rgpd { max-width: 672px; font-size: 12px; line-height: 18px; color: #cfcec7; text-align: left; }
+  .rgpd a { text-decoration: underline; text-underline-offset: 2px; }
+  .rgpd a:hover, .rgpd a:focus-visible { color: var(--accent); }
+  .send:disabled { opacity: .65; cursor: progress; }
+  .send:disabled:hover { background: var(--dark); }
+  .send:disabled:hover span { color: var(--accent); }
+  @media (max-width: 600px) {
+    .news { padding-block: 56px; }
+    .field { height: 60px; padding-left: 16px; }
+    .send { min-width: 96px; padding: 0 14px; }
+  }
+</style>
+
+<script>
+  import { initForm } from '../scripts/form-submit';
+  const form = document.getElementById('newsletter-form') as HTMLFormElement | null;
+  if (form) initForm({
+    form,
+    honeypot: 'email_address_check',
+    endpoint: form.dataset.endpoint,
+    messages: {
+      busy: 'Envoi en cours…',
+      retry: 'Réessayer',
+      progress: 'Inscription en cours…',
+      ok: 'Merci, votre inscription est bien prise en compte.',
+      failed: 'L’inscription n’a pas abouti. Votre adresse est conservée dans le champ : cliquez sur «\u00a0Réessayer\u00a0», ou écrivez-nous via la page contact.',
+      timeout: 'L’inscription prend trop de temps (plus de 15 secondes). Vérifiez votre connexion, puis cliquez sur «\u00a0Réessayer\u00a0».',
+      wait: 'Merci de patienter quelques secondes avant un nouvel envoi.',
+    },
+  });
+</script>

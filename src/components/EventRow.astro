@@ -1,0 +1,41 @@
+---
+import { Picture } from 'astro:assets';
+import { picProps, widthsFor } from '../lib/cms';
+import { type Evt, period, badge, monthKey } from '../data/events';
+interface Props { e: Evt; stack?: boolean; eager?: boolean; }
+const { e, stack = true, eager = false } = Astro.props;
+---
+<article class={`row${stack ? ' stack' : ''}`} data-reveal="bottom" data-month={monthKey(e.date)}>
+  <a class="thumb" data-view href={`/agenda/${e.slug}`} tabindex="-1" aria-hidden="true">
+    <span class="badge" aria-hidden="true">{badge(e.date)}</span>
+    <span class="view" aria-hidden="true">Voir</span>
+    <Picture {...picProps(e.image)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(e.image, [240, 480])} sizes="240px" alt={e.alt} loading={eager ? 'eager' : 'lazy'} />
+  </a>
+  <div class="txt">
+    <h3 class="display" id={`evt-${e.slug}-${stack ? 's' : 'n'}`}><a href={`/agenda/${e.slug}`}>{e.title}</a></h3>
+    <p class="meta upper"><time datetime={e.date}>{period(e)}</time> · {e.venue}</p>
+  </div>
+  <a class="bracket more" href={`/agenda/${e.slug}`} aria-describedby={`evt-${e.slug}-${stack ? 's' : 'n'}`}>Voir la fiche</a>
+</article>
+
+<style>
+  .row { display: grid; grid-template-columns: 240px 1fr auto; gap: 32px; align-items: center; padding: 24px 0; border-top: 1px solid var(--line); }
+  .row[hidden] { display: none; }
+  .thumb { position: relative; display: block; width: 240px; height: 162px; }
+  .thumb :global(img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .badge { position: absolute; left: 0; top: 0; z-index: 3; padding: 6px 8px; background: var(--accent); color: var(--ink); font: 600 13px/1 var(--font-body); letter-spacing: .04em; }
+  h3 { font-size: var(--text-3xl); line-height: 1.12; }
+  h3 a:hover, h3 a:focus-visible { color: var(--accent-ink); }
+  .meta { margin-top: 12px; font-size: 13px; letter-spacing: .08em; }
+  .more { white-space: nowrap; }
+  /* Empilement : chaque ligne se colle en haut, la suivante glisse par-dessus (écran large) */
+  @media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+    .stack { position: sticky; top: 60px; background: var(--bg); }
+    .stack:focus-within { z-index: 2; }
+  }
+  @media (max-width: 900px) {
+    .row { grid-template-columns: 1fr; gap: 14px; }
+    .thumb { width: 100%; height: auto; aspect-ratio: 3 / 2; }
+    .more { justify-self: start; }
+  }
+</style>

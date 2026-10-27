@@ -1,0 +1,21 @@
+---
+import Base from '../../layouts/Base.astro';
+import AgendaListing from '../../components/AgendaListing.astro';
+import BigCta from '../../components/BigCta.astro';
+import Newsletter from '../../components/Newsletter.astro';
+import { upcoming, longDate } from '../../data/events';
+import { site } from '../../data/site';
+import { fitDescription } from '../../lib/seo';
+const list = upcoming();
+const schema = [{ '@type': 'ItemList', name: 'Agenda UNi’SONS', itemListElement: list.map((e, i) => ({ '@type': 'ListItem', position: i + 1, url: `${site.url}/agenda/${e.slug}`, name: e.title })) }];
+const first = list[0];
+---
+<Base
+  title="Agenda | Concerts et expositions à Montpellier | UNi’SONS"
+  description={fitDescription(`Tous les rendez-vous d’UNi’SONS à Montpellier : concerts, expositions et rencontres.${first ? ` Prochain événement : ${first.title}, ${longDate(first.date)}.` : ''}`)}
+  schema={schema}
+>
+  <AgendaListing />
+  <BigCta />
+  <Newsletter />
+</Base>

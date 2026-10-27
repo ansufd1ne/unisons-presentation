@@ -1,0 +1,303 @@
+---
+import { Picture } from 'astro:assets';
+import Video from './Video.astro';
+import Marquee from './Marquee.astro';
+import GoogleMap from './GoogleMap.astro';
+import type { Block } from '../data/blocks';
+import { picProps, widthsFor } from '../lib/cms';
+interface Props { blocks: Block[]; }
+const { blocks } = Astro.props;
+const initials = (n: string) => n.split(/[\s-]+/).filter(Boolean).slice(0, 2).map((x) => x[0]).join('');
+---
+{blocks.map((b, bi) => {
+  switch (b.t) {
+    case 'lead': return (
+      <section class="lead section"><p class="display" data-highlight>{b.text}</p></section>
+    );
+    case 'text': return (
+      <section class="text section" aria-label={b.title ?? b.label}>
+        <p class="label" data-reveal="left">{b.label}</p>
+        <div class="col" data-reveal="bottom" data-reveal-delay="100">
+          {b.title && <h2 class="display">{b.title}</h2>}
+          {b.plain ? (
+            <>
+              {b.paras?.map((p) => <p>{p}</p>)}
+              {b.items && <ul class="bul">{b.items.map((i) => <li>{i}</li>)}</ul>}
+              {b.after?.map((p) => <p>{p}</p>)}
+            </>
+          ) : (
+            <>
+              {b.paras?.map((p) => <p set:html={p} />)}
+              {b.items && <ul class="bul">{b.items.map((i) => <li set:html={i} />)}</ul>}
+              {b.after?.map((p) => <p set:html={p} />)}
+            </>
+          )}
+          {b.links && <p class="links">{b.links.map((l) => <a class="bracket" href={l.href} {...(l.external ? { target: '_blank', rel: 'noopener' } : {})}>{l.label}{l.external && <span class="visually-hidden"> (nouvel onglet)</span>}</a>)}</p>}
+          {b.note && <p class="note">{b.note}</p>}
+        </div>
+      </section>
+    );
+    case 'map': return <GoogleMap query={b.query} address={b.address} title={b.title} />;
+    case 'image': return (
+      <figure class={`img section${b.narrow ? ' narrow' : ''}`} data-reveal="bottom">
+        <Picture {...picProps(b.img)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(b.img, [640, 1080, 1600])} sizes="(max-width: 900px) 100vw, 1320px" alt={b.alt} loading="lazy" />
+        {b.caption && <figcaption>{b.caption}</figcaption>}
+      </figure>
+    );
+    case 'gallery': return (
+      <section class="gallery section" aria-label={b.title ?? 'Galerie photo'}>
+        {b.title && <h2 class="display">{b.title}</h2>}
+        <ul style={`--cols:${b.cols ?? 3}`}>
+          {b.items.map((i, ii) => (
+            <li data-reveal="bottom"><figure><Picture src={i.img} formats={['avif', 'webp']} fallbackFormat="webp" widths={[480, 800, 1200]} sizes="(max-width: 900px) 100vw, 430px" alt={i.alt} loading={bi <= 1 && ii < 2 ? 'eager' : 'lazy'} />{i.caption && <figcaption>{i.caption}</figcaption>}</figure></li>
+          ))}
+        </ul>
+      </section>
+    );
+    case 'facts': return (
+      <section class="facts section" aria-label={b.title ?? b.label}>
+        <p class="label" data-reveal="left">{b.label}</p>
+        <div class="col" data-reveal="bottom" data-reveal-delay="100">
+          {b.title && <h2 class="display">{b.title}</h2>}
+          <dl>{b.items.map(([k, v]) => b.plain ? <div><dt>{k}</dt><dd>{v}</dd></div> : <div><dt>{k}</dt><dd set:html={v} /></div>)}</dl>
+        </div>
+      </section>
+    );
+    case 'videos': return (
+      <section class="videos section" aria-label={b.title ?? b.label}>
+        <p class="label" data-reveal="left">{b.label}</p>
+        {b.title && <h2 class="display" data-reveal="bottom">{b.title}</h2>}
+        <ul style={`--cols:${b.ids.length === 1 ? 1 : 2}`}>{b.ids.map((id) => <li data-reveal="bottom"><Video id={id} /></li>)}</ul>
+      </section>
+    );
+    case 'cards': return (
+      <section class="cards section" aria-label={b.title ?? b.label}>
+        <p class="label" data-reveal="left">{b.label}</p>
+        {b.title && <h2 class="display" data-reveal="bottom">{b.title}</h2>}
+        <ul>
+          {b.items.map((c) => (
+            <li data-reveal="bottom">
+              <a href={c.href} class="card" {...(c.external ? { target: '_blank', rel: 'noopener' } : {})}>
+                {c.img ? <Picture src={c.img} formats={['avif', 'webp']} fallbackFormat="webp" widths={[300, 600]} sizes="(max-width: 900px) 100vw, 420px" alt="" loading="lazy" /> : <span class="ph" aria-hidden="true">{initials(c.title)}</span>}
+                <span class="ct display">{c.title}{c.external && <span aria-hidden="true"> ↗</span>}{c.external && <span class="visually-hidden"> (nouvel onglet)</span>}</span>
+                {c.text && <span class="cx">{c.text}</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+    case 'people': return (
+      <section class="people section" aria-label={b.title ?? b.label}>
+        <p class="label" data-reveal="left">{b.label}</p>
+        <div class="col" data-reveal="bottom">
+          {b.title && <h2 class="display">{b.title}</h2>}
+          <ul>{b.items.map((p) => (
+            <li><strong>{p.name}</strong><span>{p.role}</span>{p.email && <a class="lnk" href={`mailto:${p.email}`}>{p.email}</a>}{p.phone && <a class="lnk" href={`tel:${p.phone.replace(/\s/g, '')}`}>{p.phone}</a>}</li>
+          ))}</ul>
+        </div>
+      </section>
+    );
+    case 'timeline': return (
+      <section class="timeline section" aria-label={b.title ?? b.label}>
+        <p class="label" data-reveal="left">{b.label}</p>
+        <div class="col">
+          {b.title && <h2 class="display" data-reveal="bottom">{b.title}</h2>}
+          <ol>{b.items.map((i) => (
+            <li data-reveal="bottom"><span class="yr display">{i.year}</span><div><h3 class="display">{i.title}</h3><p set:html={i.text} /></div></li>
+          ))}</ol>
+        </div>
+      </section>
+    );
+    case 'team': return (
+      <section class="team section" aria-label="Les membres d’UNi’SONS">
+        {b.groups.map((g, gi) => (
+          <div class="group" data-reveal="bottom">
+            <h2 class="label">{g.title}</h2>
+            <ul>{g.people.map((p, pi) => (
+              <li>
+                {p.img ? <Picture {...picProps(p.img)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(p.img, [240, 480])} sizes="240px" alt={`Portrait de ${p.name}`} loading={bi <= 1 && gi === 0 && pi < 4 ? 'eager' : 'lazy'} /> : <span class="ph" aria-hidden="true">{initials(p.name)}</span>}
+                <strong>{p.name}</strong><span>{p.role}</span>
+                {p.email && <a class="lnk" href={`mailto:${p.email}`}>{p.email}</a>}
+              </li>
+            ))}</ul>
+          </div>
+        ))}
+      </section>
+    );
+    case 'downloads': return (
+      <section class="downloads section" aria-label={b.title ?? b.label}>
+        <p class="label" data-reveal="left">{b.label}</p>
+        <div class="col" data-reveal="bottom">
+          {b.title && <h2 class="display">{b.title}</h2>}
+          <ul>{b.items.map((d) => (
+            <li><div><strong>{d.title}</strong><span>{d.desc}</span></div><a class="bracket" href={d.href} {...(d.external ? { target: '_blank', rel: 'noopener' } : { download: true })}>Télécharger{d.meta && <span class="visually-hidden"> {d.title}, {d.meta}</span>}{d.external && <span class="visually-hidden"> (nouvel onglet)</span>}</a>{d.meta && <em>{d.meta}</em>}</li>
+          ))}</ul>
+        </div>
+      </section>
+    );
+    case 'shelf': return (
+      <section class="shelf section" aria-label={b.title ?? b.label}>
+        <p class="label" data-reveal="left">{b.label}</p>
+        {b.title && <h2 class="display" data-reveal="bottom">{b.title}</h2>}
+        <ul>
+          {b.items.map((i) => (
+            <li data-reveal="bottom">
+              {i.img ? <Picture {...picProps(i.img)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(i.img, [300, 600])} sizes="(max-width: 900px) 100vw, 420px" alt={i.alt ?? ''} loading="lazy" /> : <span class="ph" aria-hidden="true">{initials(i.title)}</span>}
+              <strong class="ct display">{i.title}</strong>
+              {i.author && <span class="au">{i.author}</span>}
+              {i.text && <span class="cx">{i.text}</span>}
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+    case 'listen': return (
+      <section class="listen section" aria-label={b.title ?? b.label}>
+        <p class="label" data-reveal="left">{b.label}</p>
+        <div class="col" data-reveal="bottom">
+          {b.title && <h2 class="display">{b.title}</h2>}
+          <ul>{b.items.map((l) => (
+            <li><a class="bracket" href={l.href} target="_blank" rel="noopener noreferrer">{l.label}<span aria-hidden="true"> ↗</span><span class="visually-hidden"> (nouvel onglet)</span></a></li>
+          ))}</ul>
+        </div>
+      </section>
+    );
+    case 'marquee': return <Marquee words={b.words} />;
+    case 'episodes': return (
+      <section class="episodes section" aria-label={b.title ?? b.label}>
+        <p class="label" data-reveal="left">{b.label}</p>
+        <ol>{b.items.map((e) => (
+          <li id={e.id} data-reveal="bottom">
+            <div class="ep-text">
+              <h2 class="display">{e.title}</h2>
+              {e.meta && <p class="em">{e.meta}</p>}
+              {e.short && <p>{e.short}</p>}
+              <p class="ep-link"><a class="bracket" href={e.href}>Voir l’épisode<span class="visually-hidden"> {e.title}</span></a></p>
+            </div>
+            <div class="ep-img">
+              {e.img ? <Picture {...picProps(e.img)} formats={['avif', 'webp']} fallbackFormat="webp" widths={widthsFor(e.img, [400, 800])} sizes="(max-width: 900px) 100vw, 420px" alt={e.alt ?? ''} loading="lazy" /> : <span class="ph" aria-hidden="true">{e.title}</span>}
+            </div>
+          </li>
+        ))}</ol>
+      </section>
+    );
+    case 'funding': return (
+      <section class="funding section"><Picture src={b.img} formats={['png']} fallbackFormat="webp" widths={[300]} alt={b.alt} loading="lazy" /><p>{b.text}</p></section>
+    );
+  }
+})}
+
+<style>
+  .lead { padding-block: 40px 70px; }
+  .lead .display { font-size: var(--text-4xl); line-height: 1.15; max-width: 1180px; margin-left: min(11vw, 160px); }
+  .text, .facts, .people, .timeline, .downloads, .listen, .episodes { display: grid; grid-template-columns: 448px 1fr; padding-block: 56px; border-top: 1px solid var(--line); }
+  .col { max-width: 780px; display: grid; gap: 18px; align-content: start; }
+  .col h2 { font-size: var(--text-4xl); line-height: 1.1; margin-bottom: 6px; }
+  .col p, .bul li { font-size: 18px; line-height: 28px; }
+  .col :global(a:not(.bracket)) { text-decoration: underline; text-underline-offset: 3px; }
+  .col :global(a:not(.bracket):hover) { color: var(--accent-ink); }
+  .bul { display: grid; gap: 10px; padding-left: 22px; list-style: disc; }
+  .bul li::marker { color: var(--accent-ink); }
+  .links { display: flex; flex-wrap: wrap; gap: 16px 32px; }
+  .note { padding: 12px 16px; background: var(--bg-2); border-left: 3px solid var(--accent); font-size: 15px !important; line-height: 24px !important; }
+  .img { margin: 0; padding-block: 24px; }
+  .img :global(img) { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+  .img.narrow { max-width: 1000px; margin-left: auto; margin-right: auto; }
+  .img figcaption { margin-top: 10px; font-size: 13px; color: var(--muted); }
+  .gallery { padding-block: 40px; }
+  .gallery h2 { font-size: var(--text-4xl); line-height: 1.1; margin-bottom: 28px; }
+  .gallery ul { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 20px; }
+  .gallery figure { margin: 0; }
+  .gallery :global(img) { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+  .gallery figcaption { margin-top: 10px; font-size: 14px; line-height: 22px; }
+  dl { border-top: 1px solid var(--line); }
+  dl > div { display: grid; grid-template-columns: 200px 1fr; gap: 24px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  dt { font: 500 13px/24px var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--strong); }
+  dd { margin: 0; }
+  .videos { border-top: 1px solid var(--line); padding-block: 56px; }
+  .videos h2 { font-size: var(--text-4xl); line-height: 1.1; margin: 20px 0 32px; }
+  .videos ul { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 24px; }
+  .cards { background: var(--bg-2); padding-block: 72px; }
+  .cards .label { margin-bottom: 28px; }
+  .cards h2 { font-size: var(--text-4xl); line-height: 1.1; margin: -8px 0 36px; }
+  .cards ul { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .card { display: grid; gap: 12px; align-content: start; height: 100%; }
+  .card :global(img), .ph { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .ph { display: grid; place-items: center; background: var(--ink); color: var(--accent); font: 400 72px/1 var(--font-display); }
+  .ct { font-size: 30px; line-height: 1.1; }
+  .cx { color: var(--text); font-size: 15px; line-height: 23px; }
+  .card:hover .ct, .card:focus-visible .ct { color: var(--accent-ink); }
+  .people ul { display: grid; gap: 0; border-top: 1px solid var(--line); }
+  .people li { display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .people strong { color: var(--ink); }
+  .lnk { text-decoration: underline; text-underline-offset: 3px; }
+  .lnk:hover, .lnk:focus-visible { color: var(--accent-ink); }
+  .timeline ol { display: grid; border-top: 1px solid var(--line); }
+  .timeline li { display: grid; grid-template-columns: 140px 1fr; gap: 24px; padding: 28px 0; border-bottom: 1px solid var(--line); }
+  .yr { font-size: 56px; line-height: 1; color: var(--accent-ink); }
+  .timeline h3 { font-size: 30px; line-height: 1.15; margin-bottom: 8px; }
+  .timeline li p { font-size: 17px; line-height: 27px; max-width: 640px; }
+  .team { padding-block: 48px; display: grid; gap: 56px; }
+  .team .group > .label { margin-bottom: 20px; }
+  .team ul { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px 24px; }
+  .team li { display: grid; gap: 4px; align-content: start; }
+  .team li :global(img), .team .ph { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; margin-bottom: 8px; filter: grayscale(1); }
+  .team .ph { display: grid; place-items: center; background: var(--ink); color: var(--accent); font-size: 56px; filter: none; }
+  .team strong { font: 400 24px/1.15 var(--font-display); text-transform: uppercase; color: var(--ink); letter-spacing: -.01em; }
+  .team span:not(.ph) { font-size: 14px; line-height: 20px; color: var(--text); }
+  .team .lnk { font-size: 13px; word-break: break-all; }
+  .downloads ul { display: grid; border-top: 1px solid var(--line); }
+  .downloads li { display: grid; grid-template-columns: 1fr auto auto; gap: 24px; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .downloads strong { display: block; color: var(--ink); }
+  .downloads span { font-size: 14px; color: var(--text); }
+  .downloads em { font-style: normal; font-size: 13px; color: var(--muted); min-width: 90px; text-align: right; }
+  .shelf { background: var(--bg-2); padding-block: 72px; }
+  .shelf .label { margin-bottom: 28px; }
+  .shelf h2 { font-size: var(--text-4xl); line-height: 1.1; margin: -8px 0 36px; }
+  .shelf ul { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px 24px; }
+  .shelf li { display: grid; gap: 8px; align-content: start; }
+  .shelf li :global(img), .shelf .ph { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
+  .shelf .ph { display: grid; place-items: center; background: var(--ink); color: var(--accent); font: 400 72px/1 var(--font-display); }
+  .shelf .ct { font-size: 26px; line-height: 1.15; color: var(--ink); }
+  .shelf .au { font: 500 13px/20px var(--font-body); letter-spacing: .12em; text-transform: uppercase; color: var(--strong); }
+  .shelf .cx { font-size: 15px; line-height: 23px; }
+  .episodes { display: block; padding-block: 56px; border-top: 1px solid var(--line); }
+  .episodes .label { margin-bottom: 28px; }
+  .episodes ol { display: grid; border-top: 1px solid var(--line); }
+  .episodes li { display: grid; grid-template-columns: 1fr 420px; gap: 48px; align-items: center; padding: 36px 0; border-bottom: 1px solid var(--line); }
+  .ep-text { display: grid; gap: 14px; align-content: start; }
+  .episodes h2 { font-size: var(--text-4xl); line-height: 1.1; }
+  .episodes .em { font-size: 14px !important; line-height: 22px !important; color: var(--strong); letter-spacing: .04em; }
+  .episodes .ep-text p { font-size: 17px; line-height: 27px; max-width: 620px; }
+  .episodes .ep-text .ep-link { margin-top: 6px; }
+  .ep-img :global(img), .ep-img .ph { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+  .ep-img .ph { display: grid; place-items: center; padding: 24px; background: var(--ink); color: var(--accent); font: 400 40px/1.1 var(--font-display); text-transform: uppercase; text-align: center; overflow-wrap: anywhere; }
+  .listen ul { display: grid; border-top: 1px solid var(--line); }
+  .listen li { border-bottom: 1px solid var(--line); padding: 18px 0; display: flex; }
+  .listen li .bracket { flex: 1; display: flex; justify-content: space-between; }
+  .funding { display: flex; align-items: center; gap: 24px; padding-block: 32px; border-top: 1px solid var(--line); font-size: 14px; color: var(--text); }
+  .funding :global(img) { width: 220px; height: auto; }
+  @media (max-width: 1100px) {
+    .text, .facts, .people, .timeline, .downloads, .listen, .episodes { grid-template-columns: 1fr; gap: 24px; }
+    .shelf ul { grid-template-columns: repeat(2, 1fr); }
+    .cards ul { grid-template-columns: repeat(2, 1fr); }
+    .team ul { grid-template-columns: repeat(3, 1fr); }
+    .lead .display { margin-left: 0; }
+  }
+  @media (max-width: 900px) {
+    .text, .facts, .people, .timeline, .downloads, .listen, .episodes { padding-block: 40px; }
+    .shelf ul { grid-template-columns: 1fr; }
+    .episodes li { grid-template-columns: 1fr; gap: 20px; }
+    .ep-img { order: -1; }
+    dl > div { grid-template-columns: 1fr; gap: 4px; }
+    .videos ul, .gallery ul { grid-template-columns: 1fr; }
+    .cards ul { grid-template-columns: 1fr; }
+    .team ul { grid-template-columns: repeat(2, 1fr); }
+    .people li { grid-template-columns: 1fr; gap: 2px; }
+    .timeline li { grid-template-columns: 1fr; gap: 8px; }
+    .downloads li { grid-template-columns: 1fr; gap: 8px; }
+    .downloads em { text-align: left; }
+    .funding { flex-direction: column; align-items: flex-start; }
+  }
+</style>
